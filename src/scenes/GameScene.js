@@ -121,6 +121,7 @@ export class GameScene extends Phaser.Scene {
     this.hud.showMapName(this.currentMapData.name);
 
     this.checkTriggers();
+    this.maybeSpawnArenaReturnPortal();
     this.createAmbientEffects();
 
     this.cameras.main.fadeIn(500);
@@ -139,6 +140,7 @@ export class GameScene extends Phaser.Scene {
     this.mapTiles = [];
     this.interactables = [];
     this.npcSprites = [];
+    this.currentBoss = null;
     this.enemySprites = [];
 
     this.cameras.main.setBackgroundColor(mapData.bgColor);
@@ -592,7 +594,10 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  handleBossDefeated() {
+  handleBossDefeated(X, Y) {
+    const posX = X ?? 320;
+    const posY = Y ?? 200;
+
     if (this.currentMapId === 'boss_coleccionista') {
       this.time.delayedCall(1000, () => {
         this.cameras.main.fade(1000, 0, 0, 0);
@@ -601,23 +606,31 @@ export class GameScene extends Phaser.Scene {
         });
       });
     } else if (this.currentMapId === 'boss_distancia') {
-      this.showReturnPortal('pantano_toxicidad', 1, 10);
+      this.showReturnPortal('pantano_toxicidad', 1, 10, posX, posY);
     } else if (this.currentMapId === 'boss_toxicidad') {
-      this.showReturnPortal('valle_desinteres', 1, 10);
+      this.showReturnPortal('valle_desinteres', 1, 10, posX, posY);
     } else if (this.currentMapId === 'boss_desinteres') {
-      this.showReturnPortal('montanas_inseguridad', 1, 10);
+      this.showReturnPortal('montanas_inseguridad', 1, 10, posX, posY);
     } else if (this.currentMapId === 'boss_inseguridad') {
-      this.showReturnPortal('lago_celos', 1, 10);
+      this.showReturnPortal('lago_celos', 1, 10, posX, posY);
     } else if (this.currentMapId === 'boss_celos') {
-      this.showReturnPortal('reino_recuerdos', 12, 18);
+      this.showReturnPortal('reino_recuerdos', 12, 18, posX, posY);
     }
   }
 
-  showReturnPortal(targetMap, spawnX, spawnY) {
-    const portalZone = this.add.zone(320, 200, 32, 32);
+  maybeSpawnArenaReturnPortal() {
+    const boss = this.currentMapData?.boss;
+    if (!boss || !boss.fragment) return;
+    if (this.currentBoss) return;
+    if (!GameState.defeatedBosses.includes(boss.type)) return;
+    this.handleBossDefeated(this.player.x, this.player.y - 16);
+  }
+
+  showReturnPortal(targetMap, spawnX, spawnY, x = 320, y = 200) {
+    const portalZone = this.add.zone(x, y, 32, 32);
     this.physics.add.existing(portalZone, true);
 
-    const portal = this.add.circle(320, 200, 16, 0xc4a35a, 0.6);
+    const portal = this.add.circle(x, y, 16, 0xc4a35a, 0.6);
     this.tweens.add({
       targets: portal,
       scale: { from: 0.8, to: 1.2 },
@@ -627,7 +640,7 @@ export class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
-    const label = this.add.text(320, 230, 'Portal - Pulsa E', {
+    const label = this.add.text(x, y + 30, 'Portal - Pulsa E', {
       fontSize: '10px',
       color: '#c4a35a',
       fontFamily: 'monospace',
@@ -635,12 +648,12 @@ export class GameScene extends Phaser.Scene {
       strokeThickness: 2,
     }).setOrigin(0.5);
 
-    const indicator = this.add.text(320, 170, '▼', {
+    const indicator = this.add.text(x, y - 30, '▼', {
       fontSize: '10px', color: '#f1c40f', fontFamily: 'monospace',
     }).setOrigin(0.5);
     this.tweens.add({
       targets: indicator,
-      y: 167,
+      y: y - 33,
       duration: 500,
       yoyo: true,
       repeat: -1,

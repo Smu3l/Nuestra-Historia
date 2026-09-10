@@ -221,11 +221,18 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
+    if (this.isDead) return;
     this.isDead = true;
+
+    const scene = this.scene;
     this.body.setVelocity(0, 0);
     this.attackTimer = Infinity;
 
     this.scene.cameras.main.flash(1000, 255, 255, 255);
+
+    const fragment = this.config.fragment;
+    const fragmentName = this.config.fragmentName;
+    const defeatDialogue = this.config.dialogue_defeat;
 
     this.scene.tweens.add({
       targets: this,
@@ -238,22 +245,25 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         this.nameText.destroy();
         this.destroy();
 
-        GameState.defeatedBosses.push(this.bossType);
-
-        if (this.config.fragment) {
-          GameState.fragments.push(this.config.fragment);
+        if (!GameState.defeatedBosses.includes(this.bossType)) {
+          GameState.defeatedBosses.push(this.bossType);
         }
 
-        this.scene.time.delayedCall(500, () => {
-          if (this.config.fragment) {
-            this.scene.showFragmentScene(this.config.fragment, this.config.fragmentName);
-          } else {
-            this.scene.showDialogue(Dialogues[this.config.dialogue_defeat] || ['El enemigo ha sido derrotado.']);
-            this.scene.time.delayedCall(2000, () => {
-              this.scene.events.emit('boss-defeated');
-            });
+        if (fragment) {
+          if (!GameState.fragments.includes(fragment)) {
+            GameState.fragments.push(fragment);
           }
-        });
+          scene.time.delayedCall(500, () => {
+            scene.showFragmentScene(fragment, fragmentName);
+          });
+        } else {
+          scene.time.delayedCall(500, () => {
+            scene.showDialogue(Dialogues[defeatDialogue] || ['El enemigo ha sido derrotado.']);
+            scene.time.delayedCall(2000, () => {
+              scene.events.emit('boss-defeated');
+            });
+          });
+        }
       },
     });
 
