@@ -22,6 +22,7 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     this.isDialogActive = false;
+    this._deathInProgress = false;
     this.interactables = [];
     this.npcSprites = [];
     this.enemySprites = [];
@@ -92,25 +93,32 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    this.events.on('player-hurt', (hp) => {
-      this.hud.update();
-    });
+    // scene.events survive scene.restart in Phaser, so bind these once per
+    // scene instance; otherwise every restart duplicates listeners and a
+    // single death would trigger N handleDeath calls (restart storm).
+    if (!this._listenersBound) {
+      this._listenersBound = true;
 
-    this.events.on('player-death', () => {
-      this.handleDeath();
-    });
+      this.events.on('player-hurt', (hp) => {
+        this.hud.update();
+      });
 
-    this.events.on('boss-defeated', () => {
-      this.handleBossDefeated();
-    });
+      this.events.on('player-death', () => {
+        this.handleDeath();
+      });
 
-    this.events.on('boss-start', (name) => {
-      if (this.currentBoss && this.currentBoss.config.dialogue_intro) {
-        this.isDialogActive = true;
-        const lines = Dialogues[this.currentBoss.config.dialogue_intro] || [];
-        this.dialogueSystem.show(lines);
-      }
-    });
+      this.events.on('boss-defeated', () => {
+        this.handleBossDefeated();
+      });
+
+      this.events.on('boss-start', (name) => {
+        if (this.currentBoss && this.currentBoss.config.dialogue_intro) {
+          this.isDialogActive = true;
+          const lines = Dialogues[this.currentBoss.config.dialogue_intro] || [];
+          this.dialogueSystem.show(lines);
+        }
+      });
+    }
 
     if (!GameState.visitedMaps.includes(this.targetMap)) {
       GameState.visitedMaps.push(this.targetMap);
@@ -555,8 +563,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   handleDeath() {
-    this.cameras.main.fade(1000, 0, 0, 0);
-    this.time.delayedCall(1200, () => {
+    if (this._deathInProgress) return;
+    this._deathInProgress = true;
+
+    this.cameras.main.fade(400, 0, 0, 0);
+    this.time.delayedCall(600, () => {
+      this._deathInProgress = false;
       GameState.hp = GameState.maxHP;
       this.scene.restart({ map: this.currentMapId });
     });

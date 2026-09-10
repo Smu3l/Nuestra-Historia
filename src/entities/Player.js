@@ -15,6 +15,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.hp = GameState.hp;
     this.maxHP = GameState.maxHP;
     this.direction = 'down';
+    this.isDead = false;
     this.isAttacking = false;
     this.isHurt = false;
     this.invincible = false;
@@ -84,6 +85,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(cursors, time, delta) {
+    if (this.isDead) {
+      this.body.setVelocity(0, 0);
+      return;
+    }
+
     if (this.isAttacking || this.isHurt || this.scene.isDialogActive) {
       this.body.setVelocity(0, 0);
       return;
@@ -128,7 +134,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   attack() {
-    if (this.isAttacking || this.attackCooldown > 0) return;
+    if (this.isDead || this.isAttacking || this.attackCooldown > 0) return;
 
     this.isAttacking = true;
     this.attackCooldown = 400;
@@ -175,7 +181,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   takeDamage(amount) {
-    if (this.invincible || this.isHurt || this.scene.isDialogActive) return;
+    if (this.isDead || this.invincible || this.isHurt || this.scene.isDialogActive) return;
 
     this.hp = Math.max(0, this.hp - amount);
     GameState.hp = this.hp;
@@ -206,6 +212,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.scene.events.emit('player-hurt', this.hp);
 
     if (this.hp <= 0) {
+      this.isDead = true;
+      this.body.setVelocity(0, 0);
       this.scene.events.emit('player-death');
     }
   }
@@ -265,7 +273,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   interact() {
-    if (!this.interactTarget) return;
+    if (this.isDead || !this.interactTarget) return;
     const target = this.interactTarget;
 
     if (target.interactType === 'exit') {

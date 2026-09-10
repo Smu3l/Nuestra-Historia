@@ -8,7 +8,7 @@ export class SaveSystem {
   async save() {
     const data = GameState.toSaveData();
     data.timestamp = Date.now();
-    data.version = '1.1.1';
+    data.version = '1.1.2';
 
     if (this.isElectron) {
       try {
