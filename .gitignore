@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-electron/
+*.log
+npm-debug.log*
+vite-*.txt
+electron/smoke-test-result.json
+electron/smoke-final.txt
+electron/debug-*.js
+electron/*-output.txt
+.DS_Store
+Thumbs.db
