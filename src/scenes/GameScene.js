@@ -52,7 +52,8 @@ export class GameScene extends Phaser.Scene {
     this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
-    this.input.keyboard.on('keydown-SPACE', () => {
+    this.input.keyboard.on('keydown-SPACE', (event) => {
+      if (event.repeat) return;
       if (this.isDialogActive) {
         this.dialogueSystem.advance();
       } else {
@@ -60,7 +61,8 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    this.input.keyboard.on('keydown-E', () => {
+    this.input.keyboard.on('keydown-E', (event) => {
+      if (event.repeat) return;
       if (this.isDialogActive) {
         this.dialogueSystem.advance();
       } else {
@@ -68,7 +70,14 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    this.input.keyboard.on('keydown-ENTER', () => {
+    this.input.keyboard.on('keydown-ENTER', (event) => {
+      if (event.repeat) return;
+      if (this.isDialogActive) {
+        this.dialogueSystem.advance();
+      }
+    });
+
+    this.input.on('pointerdown', () => {
       if (this.isDialogActive) {
         this.dialogueSystem.advance();
       }
@@ -539,37 +548,14 @@ export class GameScene extends Phaser.Scene {
   changeMap(targetMap, spawnX, spawnY) {
     this.cameras.main.fade(500, 0, 0, 0);
     this.time.delayedCall(600, () => {
-      this.cleanupMap();
       this.scene.restart({ map: targetMap, spawnX, spawnY });
     });
-  }
-
-  cleanupMap() {
-    this.mapTiles.forEach(t => t.destroy());
-    this.interactables.forEach(i => {
-      if (i.interactIndicator) i.interactIndicator.destroy();
-      i.destroy();
-    });
-    this.npcSprites.forEach(n => n.destroy());
-    this.enemySprites.forEach(e => {
-      if (e.active) {
-        e.hpBarBg?.destroy();
-        e.hpBar?.destroy();
-        e.destroy();
-      }
-    });
-    if (this.currentBoss && this.currentBoss.active) {
-      this.currentBoss.destroy();
-    }
-    this.mapGroup.clear(true, true);
-    if (this.hud) this.hud.destroy();
   }
 
   handleDeath() {
     this.cameras.main.fade(1000, 0, 0, 0);
     this.time.delayedCall(1200, () => {
       GameState.hp = GameState.maxHP;
-      this.cleanupMap();
       this.scene.restart({ map: this.currentMapId });
     });
   }

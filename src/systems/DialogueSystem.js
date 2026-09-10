@@ -64,7 +64,7 @@ export class DialogueSystem {
   }
 
   show(dialogueLines, onComplete) {
-    if (!dialogueLines || dialogueLines.length === 0) return;
+    if (!dialogueLines || dialogueLines.length === 0 || this.isActive) return;
 
     this.isActive = true;
     this.currentDialogue = dialogueLines;
@@ -98,6 +98,7 @@ export class DialogueSystem {
 
     let charIndex = 0;
     if (this.typeTimer) this.typeTimer.destroy();
+    this.promptText.setAlpha(0);
     this.typeTimer = this.scene.time.addEvent({
       delay: 30,
       repeat: this.fullText.length - 1,
@@ -108,6 +109,7 @@ export class DialogueSystem {
           charIndex++;
         } else {
           this.typing = false;
+          this.promptText.setAlpha(1);
         }
       },
     });

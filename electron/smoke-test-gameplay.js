@@ -14,9 +14,9 @@ app.on('ready', () => {
     backgroundColor: '#0a0a1e',
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: false,
+      contextIsolation: true,
       backgroundThrottling: false,
-      preload: path.join(__dirname, 'debug-preload.js'),
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 

@@ -175,7 +175,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   takeDamage(amount) {
-    if (this.invincible || this.isHurt) return;
+    if (this.invincible || this.isHurt || this.scene.isDialogActive) return;
 
     this.hp = Math.max(0, this.hp - amount);
     GameState.hp = this.hp;

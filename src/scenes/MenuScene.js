@@ -60,6 +60,7 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.selectedOption = 0;
+    this.hoverIndex = -1;
     this.menuOptions = [];
 
     const makeOption = (text, action, y) => {
@@ -71,8 +72,15 @@ export class MenuScene extends Phaser.Scene {
       }).setOrigin(0.5);
 
       btn.on('pointerover', () => {
-        this.selectedOption = this.menuOptions.findIndex(o => o.btn === btn);
+        this.hoverIndex = this.menuOptions.findIndex(o => o.btn === btn);
         this.updateSelection();
+      });
+
+      btn.on('pointerout', () => {
+        if (this.hoverIndex !== -1) {
+          this.hoverIndex = -1;
+          this.updateSelection();
+        }
       });
 
       btn.on('pointerdown', () => {
@@ -149,14 +157,18 @@ export class MenuScene extends Phaser.Scene {
   }
 
   updateSelection() {
+    const activeIndex = this.hoverIndex >= 0 ? this.hoverIndex : this.selectedOption;
     this.visibleOptions.forEach((opt, i) => {
-      if (i === this.selectedOption) {
-        opt.label.setColor('#f1c40f');
-        opt.btn.setScale(1.05);
-      } else {
-        opt.label.setColor('#ffffff');
-        opt.btn.setScale(1);
-      }
+      const active = i === activeIndex;
+      opt.label.setColor(active ? '#f1c40f' : '#ffffff');
+      opt.btn.setTint(active ? 0xffffff : 0x8a8a8a);
+      this.tweens.killTweensOf(opt.btn);
+      this.tweens.add({
+        targets: opt.btn,
+        scale: active ? 1.06 : 1,
+        duration: 100,
+        ease: 'Quad.easeOut',
+      });
     });
   }
 

@@ -5,6 +5,7 @@ dist-electron/
 npm-debug.log*
 vite-*.txt
 electron/smoke-test-result.json
+electron/smoke-test-gameplay.json
 electron/smoke-final.txt
 electron/debug-*.js
 electron/*-output.txt
