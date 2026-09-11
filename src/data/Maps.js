@@ -261,12 +261,13 @@ export const Maps = {
     tiles: generateLakeMap(),
     tileNames: { 0: 'tile_grass', 1: 'tile_water', 2: 'tile_tree', 3: 'tile_rock', 4: 'tile_island', 5: 'tile_dark' },
     walls: [2, 3, 1],
+    wallBodies: { 2: { width: 6, height: 6, offsetX: 5, offsetY: 10 } },
     objects: [
       { tileX: 5, tileY: 5, type: 'interact', id: 'celos_intro', sprite: 'tile_sign', dialogue: 'celos_intro' },
       { tileX: 27, tileY: 10, type: 'boss_arena', id: 'boss_celos', target: 'boss_celos' },
     ],
     npcs: [
-      { tileX: 14, tileY: 14, sprite: 'npc_wanderer', dialogue: 'celos_npc1', name: 'Guardián' },
+      { tileX: 7, tileY: 12, sprite: 'npc_wanderer', dialogue: 'celos_npc1', name: 'Guardián' },
     ],
     enemies: [
       { type: 'enemy_shadow', x: 10, y: 6, hp: 3, damage: 1, patrol: [{ x: 10, y: 6 }, { x: 14, y: 6 }] },
@@ -274,7 +275,7 @@ export const Maps = {
     ],
     boss: null,
     letters: [
-      { tileX: 22, tileY: 4, id: 'letter_5' },
+      { tileX: 23, tileY: 3, id: 'letter_5' },
     ],
   },
 
@@ -448,29 +449,34 @@ function generateMountainMap() {
   return map;
 }
 
+function parseMap(rows) {
+  const codes = { '.': 0, '~': 1, 'T': 2, 'R': 3, '#': 4, 'D': 5, };
+  return rows.map(row => row.split('').map(c => codes[c] ?? 0));
+}
+
 function generateLakeMap() {
-  const w = 30, h = 20;
-  const map = [];
-  for (let y = 0; y < h; y++) {
-    const row = [];
-    for (let x = 0; x < w; x++) {
-      if (y === 0 || y === h - 1 || x === 0 || x === w - 1) {
-        row.push(2);
-      } else if (Math.abs(x - 15) + Math.abs(y - 10) < 6) {
-        row.push(1);
-      } else if (Math.abs(x - 15) + Math.abs(y - 10) === 6) {
-        row.push(4);
-      } else if ((x + y) % 10 === 0) {
-        row.push(2);
-      } else if ((x * 3 + y) % 13 === 0) {
-        row.push(3);
-      } else {
-        row.push(0);
-      }
-    }
-    map.push(row);
-  }
-  return map;
+  return parseMap([
+    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
+    'TDDDDDDDDDDDDDDDDDDDDDDDDDDDDT',
+    'TDRDDDDDDTDDDDDDDDDDTDDDDDDDDT',
+    'TDDDDDDDDTDDDDDDDDDTDDDDDDRDDT',
+    'TDDDTDDDTTDDRDDDDDDDTDDDDDRDDT',
+    'TDDDDDDDD......TT...T....DDDDT',
+    'TDDDDDDDD......~~~~..TTT.DDDDT',
+    'TDDDDDDDD~~~#~~~.~...TTTDDDDDT',
+    'TDDDDDDDD~~~~~#~~...TTT.DDDDDT',
+    'TDDDDDD...~~~~#~~.....T......T',
+    'TDDDDD.......................T',
+    'TDDDDDD~~~~~~#~~~~...........T',
+    'TDDDDDD......................T',
+    'TDDDDD~~~~~~~........T.......T',
+    'TDDDD..........R.............T',
+    'T............................T',
+    'T............................T',
+    'T...R....................R...T',
+    'TDDDD....RRR.......R.........T',
+    'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
+  ]);
 }
 
 function generateBossArena() {

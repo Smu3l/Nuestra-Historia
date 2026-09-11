@@ -9,6 +9,8 @@ function createWindow() {
     width: 1280,
     height: 720,
     resizable: true,
+    fullscreenable: true,
+    backgroundColor: '#0a0a1a',
     title: 'Los Fragmentos de Nuestra Historia',
     icon: path.join(__dirname, '..', 'public', 'icon.ico'),
     webPreferences: {
@@ -27,6 +29,21 @@ function createWindow() {
   }
 
   mainWindow.setMenuBarVisibility(false);
+  mainWindow.maximize();
+
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.type !== 'keyDown') return;
+
+    if (input.key === 'F11') {
+      event.preventDefault();
+      mainWindow.setFullScreen(!mainWindow.isFullScreen());
+      return;
+    }
+
+    if (input.key === 'Escape' && mainWindow.isFullScreen()) {
+      mainWindow.setFullScreen(false);
+    }
+  });
 }
 
 function getSavePath() {

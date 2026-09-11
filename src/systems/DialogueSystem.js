@@ -72,8 +72,20 @@ export class DialogueSystem {
     this.onComplete = onComplete;
     this.container.setVisible(true);
     this.scene.isDialogActive = true;
+    this.reposition();
 
     this.showLine();
+  }
+
+  reposition() {
+    const cam = this.scene.cameras.main;
+    if (!cam) return;
+
+    const zoom = cam.zoom;
+    const viewW = 640 / zoom;
+    const viewH = 360 / zoom;
+
+    this.container.setPosition(cam.scrollX + viewW / 2 - 320, cam.scrollY + viewH - 100);
   }
 
   showLine() {

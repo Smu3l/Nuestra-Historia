@@ -59,6 +59,23 @@ export class HUD {
   update() {
     this.updateHearts();
     this.fragmentCount.setText(`${GameState.fragments.length}/5`);
+    this.reposition();
+  }
+
+  reposition() {
+    const cam = this.scene.cameras.main;
+    if (!cam) return;
+
+    const zoom = cam.zoom;
+    const viewW = 640 / zoom;
+    const viewH = 360 / zoom;
+    const sx = cam.scrollX;
+    const sy = cam.scrollY;
+
+    this.heartContainer.setPosition(sx + 10, sy + 10);
+    this.mapNameText.setPosition(sx + viewW / 2, sy + 8);
+    this.fragmentContainer.setPosition(sx + viewW - 85, sy + 10);
+    this.interactPrompt.setPosition(sx + viewW / 2, sy + viewH - 28);
   }
 
   updateHearts() {

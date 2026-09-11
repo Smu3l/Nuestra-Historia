@@ -41,6 +41,8 @@ export class GameScene extends Phaser.Scene {
     );
     this.player.setDepth(10);
 
+    this.setupCamera();
+
     this.setupCollisions();
     this.hud = new HUD(this);
 
@@ -172,7 +174,13 @@ export class GameScene extends Phaser.Scene {
           tile.refreshBody();
 
           if (mapData.walls && mapData.walls.includes(tileId)) {
-            tile.body.setSize(16, 16);
+            const body = mapData.wallBodies && mapData.wallBodies[tileId];
+            if (body) {
+              tile.body.setSize(body.width, body.height);
+              tile.body.offset.set(body.offsetX ?? 0, body.offsetY ?? 0);
+            } else {
+              tile.body.setSize(16, 16);
+            }
           }
 
           this.mapTiles.push(tile);
@@ -341,6 +349,42 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  setupCamera() {
+    const cam = this.cameras.main;
+    cam.setZoom(1);
+
+    const mapW = this.currentMapData.width * 16;
+    const mapH = this.currentMapData.height * 16;
+
+    const zoom = this.currentMapData.zoom || Math.min(Math.max(640 / mapW, 360 / mapH), 1.5);
+    cam.setZoom(zoom);
+
+    this._camMapW = mapW;
+    this._camMapH = mapH;
+    this.updateCamera();
+  }
+
+  updateCamera() {
+    const cam = this.cameras.main;
+    const zoom = cam.zoom;
+    const viewW = 640 / zoom;
+    const viewH = 360 / zoom;
+    const mapW = this._camMapW;
+    const mapH = this._camMapH;
+    if (!this.player || !mapW) return;
+
+    let sx = this.player.x - viewW / 2;
+    let sy = this.player.y - viewH / 2;
+
+    if (mapW <= viewW) sx = (mapW - viewW) / 2;
+    else sx = Phaser.Math.Clamp(sx, 0, mapW - viewW);
+
+    if (mapH <= viewH) sy = (mapH - viewH) / 2;
+    else sy = Phaser.Math.Clamp(sy, 0, mapH - viewH);
+
+    cam.setScroll(sx, sy);
+  }
+
   setupCollisions() {
     const wallTiles = this.mapTiles.filter(tile => {
       if (!this.currentMapData.walls) return false;
@@ -351,13 +395,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     if (wallTiles.length > 0) {
-      const wallGroup = this.physics.add.staticGroup();
-      wallTiles.forEach(w => {
-        const newWall = wallGroup.create(w.x, w.y, w.texture.key);
-        newWall.setAlpha(0);
-        newWall.refreshBody();
-      });
-      this.physics.add.collider(this.player, wallGroup);
+      this.physics.add.collider(this.player, wallTiles);
     }
 
     this.physics.add.overlap(this.player, this.enemySprites, (player, enemy) => {
@@ -514,6 +552,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
+    this.updateCamera();
+    this.dialogueSystem.reposition();
+
     if (this.isDialogActive) return;
 
     const cursorKeys = {

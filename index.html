@@ -7,11 +7,20 @@
   <title>Los Fragmentos de Nuestra Historia</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0a0a1a; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body { background: #0a0a1a; }
+    #game-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
   </style>
 </head>
 <body>
+  <div id="game-container"></div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

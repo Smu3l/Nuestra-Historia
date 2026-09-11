@@ -11,6 +11,7 @@ import { ConfigScene } from './scenes/ConfigScene';
 
 const config = {
   type: Phaser.AUTO,
+  parent: 'game-container',
   width: 640,
   height: 360,
   pixelArt: true,
@@ -18,6 +19,7 @@ const config = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    autoRound: true,
   },
   physics: {
     default: 'arcade',
