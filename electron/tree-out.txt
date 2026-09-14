@@ -1,0 +1,41 @@
+[start]
+BODY {
+  "tree": [
+    9,
+    2
+  ],
+  "frame": [
+    16,
+    16
+  ],
+  "body": {
+    "w": 6,
+    "h": 6,
+    "ox": 5,
+    "oy": 10
+  },
+  "allInteriorTrees": 10
+}
+CANOPY-ZONE {
+  "tree": [
+    9,
+    2
+  ],
+  "canopyY": 26,
+  "playerBodyBottom": 38,
+  "trunkTop": 42,
+  "gap": 4,
+  "bodyOverlapsTrunk": false
+}
+TRUNK-ZONE {
+  "tree": [
+    9,
+    2
+  ],
+  "trunkY": 34,
+  "playerBodyBottom": 46,
+  "trunkTop": 42,
+  "bodyOverlapsTrunk": true,
+  "overlapPx": 4
+}
+[end]

@@ -1,0 +1,74 @@
+[start]
+  [r1] %c %c %c %c %c Phaser v3.90.0 (WebGL | Web Audio) %c https://phaser.io/v390 background: #ff0000 background: #ffff00 background: #00ff00 background: #00ffff color: #ffffff; background: #000000 background: transparent
+poll 0 scenes=["BootScene"]
+poll 1 scenes=["BootScene"]
+poll 2 scenes=["BootScene"]
+poll 3 scenes=["BootScene"]
+poll 4 scenes=["BootScene"]
+poll 5 scenes=["BootScene"]
+poll 6 scenes=["BootScene"]
+poll 7 scenes=["PreloadScene"]
+poll 8 scenes=["PreloadScene"]
+poll 9 scenes=["PreloadScene"]
+poll 10 scenes=["PreloadScene"]
+poll 11 scenes=["PreloadScene"]
+poll 12 scenes=["PreloadScene"]
+poll 13 scenes=["PreloadScene"]
+poll 14 scenes=["MenuScene"]
+menuUp=true
+STATE: {
+  "scene": "GameScene",
+  "window": [
+    1264,
+    655
+  ],
+  "canvasRect": [
+    75,
+    0,
+    1164,
+    655
+  ],
+  "display": [
+    1164.4444444444443,
+    655
+  ],
+  "zoom": 1.3333333333333333,
+  "scroll": [
+    0,
+    37
+  ],
+  "playerTile": [
+    1,
+    10
+  ],
+  "playerWorld": [
+    24,
+    172
+  ],
+  "map": [
+    30,
+    20
+  ],
+  "mapTiles": 20
+}
+LIVE BFS: {
+  "reachableTiles": 429,
+  "bossReachable": true,
+  "bossDist": 26,
+  "npcReachable": true,
+  "tileBoss": 0
+}
+AFTER TELEPORT: {
+  "playerWorld": [
+    440,
+    172
+  ],
+  "scroll": [
+    0,
+    37
+  ],
+  "zoom": 1.3333333333333333
+}
+saved lago-1280
+saved lago-800
+[end]

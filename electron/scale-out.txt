@@ -1,0 +1,46 @@
+[probe start]
+  [renderer] %c %c %c %c %c Phaser v3.90.0 (WebGL | Web Audio) %c https://phaser.io/v390 background: #ff0000 background: #ffff00 background: #00ff00 background: #00ffff colo
+loaded, waiting for boot...
+RESULT: {
+  "size": [
+    1264,
+    655
+  ],
+  "dpr": 1,
+  "canvasAttr": [
+    640,
+    360
+  ],
+  "canvasStyle": [
+    "1164.44px",
+    "655px"
+  ],
+  "canvasRect": [
+    74,
+    0,
+    1164,
+    655
+  ],
+  "bodySize": [
+    1264,
+    655
+  ],
+  "scale": {
+    "base": [
+      640,
+      360
+    ],
+    "game": [
+      640,
+      360
+    ],
+    "display": [
+      1164.4444444444443,
+      655
+    ],
+    "parentIsWindow": true
+  },
+  "scene": "BootScene"
+}
+screenshot saved: C:\Users\Samuel\Documents\Nuestra-Historia\electron\scale-1280x720.png
+[probe end]
