@@ -1,0 +1,46 @@
+[start]
+  [r1] %c %c %c %c %c Phaser v3.90.0 (WebGL | Web Audio) %c https://phaser.io/v390 background: #ff0000 background: #ffff00 background: #00ff00 background: #00ffff color: #ffffff; backgrou
+AUDIT boot: menuUp=true
+AUDIT scenes-registered:
+  ["BootScene","PreloadScene","MenuScene","IntroScene","GameScene","PauseScene","FinalScene","MemoryScene","ConfigScene"]
+AUDIT {"map":"casa","zoom":2,"view":[320,180],"mapPx":[320,240],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,60],"bounds":[0,0],"bossBar":null,"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":234,"walkable":234,"ratio":1,"targetsBad":[],"moved":true,"followedVert":true,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,60]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}"]}
+AUDIT {"map":"sendero_distancia","zoom":1.3333333333333333,"view":[480,270],"mapPx":[640,320],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[8,0],"bounds":[0,0],"bossBar":null,"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":654,"walkable":654,"ratio":1,"targetsBad":[],"moved":true,"followedVert":false,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,50]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,37]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[160,37]}"]}
+AUDIT {"map":"pantano_toxicidad","zoom":1.3333333333333333,"view":[480,270],"mapPx":[640,320],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,37],"bounds":[0,0],"bossBar":null,"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":590,"walkable":596,"ratio":0.99,"targetsBad":[],"moved":true,"followedVert":false,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,50]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,37]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[160,37]}"]}
+AUDIT {"map":"valle_desinteres","zoom":1.3333333333333333,"view":[480,270],"mapPx":[640,320],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,37],"bounds":[0,0],"bossBar":null,"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":666,"walkable":666,"ratio":1,"targetsBad":[],"moved":true,"followedVert":false,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,50]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,37]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[160,37]}"]}
+AUDIT {"map":"montanas_inseguridad","zoom":1.3333333333333333,"view":[480,270],"mapPx":[640,320],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,37],"bounds":[0,0],"bossBar":null,"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":683,"walkable":683,"ratio":1,"targetsBad":[],"moved":true,"followedVert":false,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,50]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,37]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[160,37]}"]}
+AUDIT {"map":"lago_celos","zoom":1.3333333333333333,"view":[480,270],"mapPx":[640,320],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,37],"bounds":[0,0],"bossBar":null,"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":533,"walkable":634,"ratio":0.841,"targetsBad":[],"moved":true,"followedVert":true,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,50]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,37]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[160,37]}"]}
+AUDIT {"map":"reino_recuerdos","zoom":1.3333333333333333,"view":[480,270],"mapPx":[640,320],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,50],"bounds":[0,0],"bossBar":null,"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":684,"walkable":684,"ratio":1,"targetsBad":[],"moved":true,"followedVert":false,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[88,50]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,37]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[160,37]}"]}
+AUDIT {"map":"boss_distancia","zoom":2,"view":[320,180],"mapPx":[320,240],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,60],"bounds":[0,0],"bossBar":[160,70],"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":234,"walkable":234,"ratio":1,"targetsBad":[],"moved":true,"followedVert":true,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,60]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}"]}
+AUDIT {"map":"boss_toxicidad","zoom":2,"view":[320,180],"mapPx":[320,240],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,60],"bounds":[0,0],"bossBar":[160,70],"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":234,"walkable":234,"ratio":1,"targetsBad":[],"moved":true,"followedVert":true,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,60]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}"]}
+AUDIT {"map":"boss_desinteres","zoom":2,"view":[320,180],"mapPx":[320,240],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,60],"bounds":[0,0],"bossBar":[160,70],"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":234,"walkable":234,"ratio":1,"targetsBad":[],"moved":true,"followedVert":true,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,60]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}"]}
+AUDIT {"map":"boss_inseguridad","zoom":2,"view":[320,180],"mapPx":[320,240],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,60],"bounds":[0,0],"bossBar":[160,70],"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":234,"walkable":234,"ratio":1,"targetsBad":[],"moved":true,"followedVert":true,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,60]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}"]}
+AUDIT {"map":"boss_celos","zoom":2,"view":[320,180],"mapPx":[320,240],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,60],"bounds":[0,0],"bossBar":[160,70],"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":234,"walkable":234,"ratio":1,"targetsBad":[],"moved":true,"followedVert":true,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,60]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}"]}
+AUDIT {"map":"boss_coleccionista","zoom":2,"view":[320,180],"mapPx":[320,240],"fitsHoriz":true,"fitsVert":true,"playerInView":true,"scroll":[0,60],"bounds":[0,0],"bossBar":[160,70],"deathListeners":1,"activeScenes":["MenuScene","GameScene"],"reachable":234,"walkable":234,"ratio":1,"targetsBad":[],"moved":true,"followedVert":true,"borders":["top:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,0]}","bottom:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,60]}","left:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}","right:{\"inView\":true,\"scrollOK\":true,\"scroll\":[0,34]}"]}
+AUDIT transition casa->sendero:
+  casa door -> {"map":"sendero_distancia","player":[168,300]}
+AUDIT death/respawn:
+  death respawn -> {"map":"sendero_distancia","hp":6,"maxHP":6,"alive":true}
+AUDIT pause resume:
+  pause -> {"pause":true,"gamePaused":true}
+AUDIT boss hud anchor:
+  boss -> {"bossActive":true,"zoom":2,"scroll":[0,60],"barWorld":[160,70],"barExpected":[160,70],"hp":14}
+AUDIT dialogue blocking:
+  dialog-block (movedY=true active=false)
+AUDIT MemoryScene:
+  MemoryScene active=true
+  MemoryScene auto-return -> {"game":true,"map":"casa"}
+AUDIT FinalScene:
+  FinalScene active=true
+  FinalScene skip -> menu=true
+AUDIT resolutions:
+  r1366: {"window":[1366,742],"rect":[35,0,1319,742],"zoom":2,"scroll":[0,60],"view":[320,180],"playerInView":true}
+  r1600: {"window":[1600,874],"rect":[35,0,1553,874],"zoom":2,"scroll":[0,60],"view":[320,180],"playerInView":true}
+  r1920: {"window":[1920,1054],"rect":[35,0,1873,1054],"zoom":2,"scroll":[0,60],"view":[320,180],"playerInView":true}
+AUDIT fullscreen F11:
+  fullscreen=true
+AUDIT perf:
+  lago perf: {"fps":60,"activeScenes":2,"mapObjects":845,"dies":1,"asBytes":0}
+AUDIT renderer-errors: []
+AUDIT console-errors (0):
+AUDIT badMaps=[]
+[end]

@@ -29,9 +29,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.attackPattern = 0;
     this.isCharging = false;
 
-    this.hpBarBg = scene.add.rectangle(320, 20, 300, 16, 0x333333);
-    this.hpBar = scene.add.rectangle(320, 20, 296, 12, 0xe74c3c);
-    this.nameText = scene.add.text(320, 32, config.name, {
+    this.hpBarBg = scene.add.rectangle(0, 0, 300, 16, 0x333333);
+    this.hpBar = scene.add.rectangle(0, 0, 296, 12, 0xe74c3c);
+    this.nameText = scene.add.text(0, 0, config.name, {
       fontSize: '10px', color: '#c4a35a', fontFamily: 'monospace',
     }).setOrigin(0.5, 0);
     this.hpBarBg.setDepth(200);
@@ -40,11 +40,23 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
     this.hpBarOriginWidth = 296;
 
+    this.anchorHud();
     scene.events.emit('boss-start', config.name);
+  }
+
+  anchorHud() {
+    const cam = this.scene.cameras.main;
+    if (!cam || !this.hpBarBg) return;
+    const zoom = cam.zoom || 1;
+    this.hpBarBg.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 20 / zoom);
+    this.hpBar.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 20 / zoom);
+    this.nameText.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 32 / zoom);
   }
 
   update(time, delta) {
     if (this.isDead || !this.active) return;
+
+    this.anchorHud();
 
     this.animTimer += delta;
     if (this.animTimer > 200) {

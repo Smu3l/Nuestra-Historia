@@ -42,6 +42,9 @@ export class GameScene extends Phaser.Scene {
     this.player.setDepth(10);
 
     this.setupCamera();
+    if (this.currentBoss) {
+      this.currentBoss.anchorHud();
+    }
 
     this.setupCollisions();
     this.hud = new HUD(this);
@@ -351,35 +354,35 @@ export class GameScene extends Phaser.Scene {
 
   setupCamera() {
     const cam = this.cameras.main;
-    cam.setZoom(1);
-
     const mapW = this.currentMapData.width * 16;
     const mapH = this.currentMapData.height * 16;
 
-    const zoom = this.currentMapData.zoom || Math.min(Math.max(640 / mapW, 360 / mapH), 1.5);
-    cam.setZoom(zoom);
+    cam.setBackgroundColor(this.currentMapData.bgColor);
+    cam.setZoom(this.currentMapData.zoom || 1);
 
     this._camMapW = mapW;
     this._camMapH = mapH;
+
     this.updateCamera();
   }
 
   updateCamera() {
+    if (!this.player) return;
+
     const cam = this.cameras.main;
     const zoom = cam.zoom;
     const viewW = 640 / zoom;
     const viewH = 360 / zoom;
     const mapW = this._camMapW;
     const mapH = this._camMapH;
-    if (!this.player || !mapW) return;
 
     let sx = this.player.x - viewW / 2;
     let sy = this.player.y - viewH / 2;
 
-    if (mapW <= viewW) sx = (mapW - viewW) / 2;
+    if (mapW < viewW) sx = (mapW - viewW) / 2;
     else sx = Phaser.Math.Clamp(sx, 0, mapW - viewW);
 
-    if (mapH <= viewH) sy = (mapH - viewH) / 2;
+    if (mapH < viewH) sy = (mapH - viewH) / 2;
     else sy = Phaser.Math.Clamp(sy, 0, mapH - viewH);
 
     cam.setScroll(sx, sy);
