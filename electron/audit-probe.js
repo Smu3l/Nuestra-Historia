@@ -401,7 +401,7 @@ async function main() {
   log('AUDIT console-errors (' + errors.length + '):');
   errors.forEach(e => log('  ERR ' + e));
 
-  const badMaps = mapResults.filter(r => !r.fitsHoriz || !r.fitsVert || !r.playerInView || r.deathListeners > 1 || r.targetsBad.length > 0 || (r.bossBar && r.bossBar.length && Math.abs(r.bossBar[0] - (r.scroll[0] + 320 / r.zoom)) > 2) || (r.bossBar && Math.abs(r.bossBar[1] - (r.scroll[1] + 20 / r.zoom)) > 2));
+  const badMaps = mapResults.filter(r => (r.mapPx[0] > r.view[0] && !r.fitsHoriz) || (r.mapPx[1] > r.view[1] && !r.fitsVert) || !r.playerInView || r.deathListeners > 1 || r.targetsBad.length > 0 || (r.bossBar && r.bossBar.length && Math.abs(r.bossBar[0] - (r.scroll[0] + 320 / r.zoom)) > 2) || (r.bossBar && Math.abs(r.bossBar[1] - (r.scroll[1] + 20 / r.zoom)) > 2));
   log('AUDIT badMaps=' + JSON.stringify(badMaps.map(r => r.map)));
 
   log('[end]');

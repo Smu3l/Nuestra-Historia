@@ -34,11 +34,8 @@ export class GameScene extends Phaser.Scene {
     this.mapGroup = this.physics.add.staticGroup();
     this.loadMap(this.targetMap);
 
-    this.player = new Player(
-      this,
-      this.spawnX ?? this.currentMapData.playerStart.x,
-      this.spawnY ?? this.currentMapData.playerStart.y
-    );
+    const spawnHere = this.findSafeSpawn(this.currentMapData, this.spawnX ?? this.currentMapData.playerStart.x, this.spawnY ?? this.currentMapData.playerStart.y);
+    this.player = new Player(this, spawnHere.x, spawnHere.y);
     this.player.setDepth(10);
 
     this.setupCamera();
@@ -352,18 +349,51 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  findSafeSpawn(mapData, tileX, tileY) {
+    const walls = mapData.walls || [];
+    const w = mapData.width;
+    const h = mapData.height;
+    const isWalkable = (x, y) => {
+      if (x < 0 || x >= w || y < 0 || y >= h) return false;
+      const id = mapData.tiles[y]?.[x];
+      return id !== undefined && !walls.includes(id);
+    };
+    const boxClear = (x, y) => {
+      for (let dy = 0; dy < 2; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (!isWalkable(x + dx, y + dy)) return false;
+        }
+      }
+      return true;
+    };
+    if (boxClear(tileX, tileY)) return { x: tileX, y: tileY };
+    for (let y = tileY - 1; y >= Math.max(0, tileY - 8); y--) {
+      if (boxClear(tileX, y)) return { x: tileX, y };
+    }
+    return { x: tileX, y: tileY };
+  }
+
   setupCamera() {
     const cam = this.cameras.main;
     const mapW = this.currentMapData.width * 16;
     const mapH = this.currentMapData.height * 16;
 
     cam.setBackgroundColor(this.currentMapData.bgColor);
-    cam.setZoom(this.currentMapData.zoom || 1);
+    cam.setZoom(this.computeCameraZoom(mapW, mapH));
 
     this._camMapW = mapW;
     this._camMapH = mapH;
+    this._camSX = this.player ? this.player.x - 320 / cam.zoom : 0;
+    this._camSY = this.player ? this.player.y - 180 / cam.zoom : 0;
 
     this.updateCamera();
+  }
+
+  computeCameraZoom(mapW, mapH) {
+    if (mapW <= 640 && mapH <= 360) {
+      return Phaser.Math.Clamp(Math.min(640 / mapW, 360 / mapH), 1, 2);
+    }
+    return 1;
   }
 
   updateCamera() {
@@ -376,16 +406,25 @@ export class GameScene extends Phaser.Scene {
     const mapW = this._camMapW;
     const mapH = this._camMapH;
 
-    let sx = this.player.x - viewW / 2;
-    let sy = this.player.y - viewH / 2;
+    let tx = this.player.x - viewW / 2;
+    let ty = this.player.y - viewH / 2;
 
-    if (mapW < viewW) sx = (mapW - viewW) / 2;
-    else sx = Phaser.Math.Clamp(sx, 0, mapW - viewW);
+    if (mapW < viewW || mapH < viewH) {
+      this._camSX = (mapW - viewW) / 2;
+      this._camSY = (mapH - viewH) / 2;
+      cam.setScroll(this._camSX, this._camSY);
+      return;
+    }
 
-    if (mapH < viewH) sy = (mapH - viewH) / 2;
-    else sy = Phaser.Math.Clamp(sy, 0, mapH - viewH);
+    tx = Phaser.Math.Clamp(tx, 0, mapW - viewW);
+    ty = Phaser.Math.Clamp(ty, 0, mapH - viewH);
 
-    cam.setScroll(sx, sy);
+    this._camSX += (tx - this._camSX) * 0.14;
+    this._camSY += (ty - this._camSY) * 0.14;
+    if (Math.abs(tx - this._camSX) < 0.1) this._camSX = tx;
+    if (Math.abs(ty - this._camSY) < 0.1) this._camSY = ty;
+
+    cam.setScroll(this._camSX, this._camSY);
   }
 
   setupCollisions() {
@@ -662,15 +701,15 @@ export class GameScene extends Phaser.Scene {
         });
       });
     } else if (this.currentMapId === 'boss_distancia') {
-      this.showReturnPortal('pantano_toxicidad', 1, 10, posX, posY);
+      this.showReturnPortal('pantano_toxicidad', 16, 42, posX, posY);
     } else if (this.currentMapId === 'boss_toxicidad') {
-      this.showReturnPortal('valle_desinteres', 1, 10, posX, posY);
+      this.showReturnPortal('valle_desinteres', 6, 41, posX, posY);
     } else if (this.currentMapId === 'boss_desinteres') {
-      this.showReturnPortal('montanas_inseguridad', 1, 10, posX, posY);
+      this.showReturnPortal('montanas_inseguridad', 8, 42, posX, posY);
     } else if (this.currentMapId === 'boss_inseguridad') {
-      this.showReturnPortal('lago_celos', 1, 10, posX, posY);
+      this.showReturnPortal('lago_celos', 38, 41, posX, posY);
     } else if (this.currentMapId === 'boss_celos') {
-      this.showReturnPortal('reino_recuerdos', 12, 18, posX, posY);
+      this.showReturnPortal('reino_recuerdos', 40, 42, posX, posY);
     }
   }
 

@@ -48,9 +48,10 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     const cam = this.scene.cameras.main;
     if (!cam || !this.hpBarBg) return;
     const zoom = cam.zoom || 1;
-    this.hpBarBg.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 20 / zoom);
-    this.hpBar.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 20 / zoom);
-    this.nameText.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 32 / zoom);
+    const uiScale = 1 / zoom;
+    this.hpBarBg.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 20 / zoom).setScale(uiScale);
+    this.hpBar.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 20 / zoom).setScale(uiScale);
+    this.nameText.setPosition(cam.scrollX + 320 / zoom, cam.scrollY + 32 / zoom).setScale(uiScale);
   }
 
   update(time, delta) {

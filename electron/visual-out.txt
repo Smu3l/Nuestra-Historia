@@ -1,0 +1,9 @@
+[start]
+--- res 1920x1080 ---
+boot menu=true
+casa {"map":"casa","win":[1904,967],"css":[1719,967],"pos":[92,0],"fills":false,"centered":true,"backing":[640,360],"zoom":1.5,"scroll":[-54,0],"view":[426.6666666666667,240],"mapPx":[320,240],"pan":false,"player":[168,172],"playerInView":true,"bgBandCols":[0,0],"bgBandRows":[0,0],"cssInfo":{"pos":"static","left":"auto","top":"auto","width":"1719.11px","height":"967px","margin":"0px","transform":"none","transformOrigin":"859.555px 483.5px"}}
+sendero {"map":"sendero_distancia","win":[1904,967],"css":[1719,967],"pos":[92,0],"fills":false,"centered":true,"backing":[640,360],"zoom":1,"scroll":[328,360],"view":[640,360],"mapPx":[1280,720],"pan":true,"player":[648,700],"playerInView":true,"bgBandCols":[0,0],"bgBandRows":[0,0],"cssInfo":{"pos":"static","left":"auto","top":"auto","width":"1719.11px","height":"967px","margin":"0px","transform":"none","transformOrigin":"859.555px 483.5px"}}
+followW {"tp":[328,360],"after":{"p":[648,554],"scroll":[328,360]}}
+dlg {"scroll":[328,360],"css":[1719,967]}
+arena {"map":"boss_toxicidad","win":[1904,967],"css":[1719,967],"pos":[92,0],"fills":false,"centered":true,"backing":[640,360],"zoom":1.5,"scroll":[-54,0],"view":[426.6666666666667,240],"mapPx":[320,240],"pan":false,"player":[168,220],"playerInView":true,"bgBandCols":[0,0],"bgBandRows":[0,0],"cssInfo":{"pos":"static","left":"auto","top":"auto","width":"1719.11px","height":"967px","margin":"0px","transform":"none","transformOrigin":"859.555px 483.5px"}}
+errors []

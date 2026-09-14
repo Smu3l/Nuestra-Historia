@@ -82,10 +82,15 @@ export class DialogueSystem {
     if (!cam) return;
 
     const zoom = cam.zoom;
+    const uiScale = 1 / zoom;
     const viewW = 640 / zoom;
     const viewH = 360 / zoom;
 
-    this.container.setPosition(cam.scrollX + viewW / 2 - 320, cam.scrollY + viewH - 100);
+    this.container.setScale(uiScale);
+    this.container.setPosition(
+      cam.scrollX + viewW / 2 - (640 * uiScale) / 2,
+      cam.scrollY + viewH - 100 * uiScale
+    );
   }
 
   showLine() {

@@ -71,11 +71,12 @@ export class HUD {
     const viewH = 360 / zoom;
     const sx = cam.scrollX;
     const sy = cam.scrollY;
+    const uiScale = 1 / zoom;
 
-    this.heartContainer.setPosition(sx + 10, sy + 10);
-    this.mapNameText.setPosition(sx + viewW / 2, sy + 8);
-    this.fragmentContainer.setPosition(sx + viewW - 85, sy + 10);
-    this.interactPrompt.setPosition(sx + viewW / 2, sy + viewH - 28);
+    this.heartContainer.setPosition(sx + 10, sy + 10).setScale(uiScale);
+    this.mapNameText.setPosition(sx + viewW / 2, sy + 8).setScale(uiScale);
+    this.fragmentContainer.setPosition(sx + viewW - 85, sy + 10).setScale(uiScale);
+    this.interactPrompt.setPosition(sx + viewW / 2, sy + viewH - 28).setScale(uiScale);
   }
 
   updateHearts() {

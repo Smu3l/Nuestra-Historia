@@ -1,13 +1,18 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
 let mainWindow;
 
 function createWindow() {
+  const wa = screen.getPrimaryDisplay().workArea;
+  const width = Math.min(1920, wa.width);
+  const height = Math.min(1080, wa.height);
+
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width,
+    height,
+    center: true,
     resizable: true,
     fullscreenable: true,
     backgroundColor: '#0a0a1a',

@@ -16,10 +16,12 @@ const config = {
   height: 360,
   pixelArt: true,
   roundPixels: true,
+  preserveDrawingBuffer: true,
+  backgroundColor: '#0a0a1a',
   scale: {
     mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    autoRound: true,
+    autoCenter: Phaser.Scale.NO_CENTER,
+    autoRound: false,
   },
   physics: {
     default: 'arcade',

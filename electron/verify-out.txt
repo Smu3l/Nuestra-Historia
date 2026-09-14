@@ -1,12 +1,46 @@
 [start]
-FILL 1366x768 {"win":[1367,742],"canvas":[36,0,1319,742],"display":[1320,742],"zoom":1.3333333333333333}
-FILL 1600x900 {"win":[1600,874],"canvas":[35,0,1554,874],"display":[1554,874],"zoom":1.3333333333333333}
-FILL 1920x1080 {"win":[1920,1054],"canvas":[35,0,1874,1054],"display":[1874,1054],"zoom":1.3333333333333333}
-MAPCHK lago_celos {"map":"lago_celos","zoom":1.3333333333333333,"view":[480,270],"mapPx":[480,320],"scroll":[0,37],"playerTile":[1,10],"hud":{"hearts":[10,47,true],"mapName":[240,45,true],"fragments":[395,47,true],"prompt":[240,279,true]},"errs":[],"expectedZoom":1.333}
-MAPCHK casa {"map":"casa","zoom":1.5,"view":[426.6666666666667,240],"mapPx":[320,240],"scroll":[-54,0],"playerTile":[10,10],"hud":{"hearts":[-43,10,true],"mapName":[160,8,true],"fragments":[288,10,true],"prompt":[160,212,true]},"errs":[],"expectedZoom":1.5}
-MAPCHK boss_toxicidad {"map":"boss_toxicidad","zoom":1.5,"view":[426.6666666666667,240],"mapPx":[240,240],"scroll":[-94,0],"playerTile":[7,13],"hud":{"hearts":[-83,10,true],"mapName":[120,8,true],"fragments":[248,10,true],"prompt":[120,212,true]},"errs":[],"expectedZoom":1.5}
-MAPCHK pantano_toxicidad {"map":"pantano_toxicidad","zoom":1.3333333333333333,"view":[480,270],"mapPx":[480,320],"scroll":[0,37],"playerTile":[1,10],"hud":{"hearts":[10,47,true],"mapName":[240,45,true],"fragments":[395,47,true],"prompt":[240,279,true]},"errs":[],"expectedZoom":1.333}
-TREE: {"tx":0,"ty":0,"body":{"w":6,"h":6,"ox":5,"oy":10}}
-WATER-BLOCK {"tile":{"tx":2,"ty":2},"tileId":3,"playerX":40,"playerY":32,"blockedDown":false}
-FULLSCREEN F11=true ESC-exit=FAIL-ESC
+=== VERIFICACION VISUAL v2 ===
+display {"x":0,"y":0,"width":1920,"height":1032}
+boot=true
+
+--- CASA ---
+casa: {"map":"casa","scroll":[-54,0],"player":[168,172],"inView":true,"viewSize":[426.6666666666667,240],"mapPx":[320,240],"zoom":1.5}
+dialogBox: {"bx":-46.66666519641876,"by":176.66666167974472,"bw":413.3333456516266,"bh":60.00000178813934,"cx":160.00000762939453,"cy":206.6666625738144,"scX":0.6666666666666666,"scY":0.6666666666666666}
+
+--- SENDERO: camera follow ---
+sendero start: {"map":"sendero_distancia","scroll":[328,360],"player":[648,684],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
+walking LEFT 2s...
+walkL: scrollDX=-230.0 playerDX=-236 firstScroll=[324,360] lastScroll=[94,360]
+walking UP 2s...
+walkU: scrollDY=-14.0 playerDY=-148 firstScroll=[78,360] lastScroll=[78,346]
+walking RIGHT 2s...
+walkR: scrollDX=229.0 firstScroll=[80,346] lastScroll=[309,346]
+walking DOWN 2s...
+walkD: scrollDY=12.0 firstScroll=[323,348] lastScroll=[326,360]
+after-all-walks: {"map":"sendero_distancia","scroll":[326,360],"player":[646,692],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
+edgeClamp: {"scrollX_clamped":true,"scrollY_clamped":true,"playerInView":true}
+
+--- BOSS ARENA ---
+boss: {"scene":{"map":"boss_distancia","scroll":[-54,0],"player":[168,204],"inView":true,"viewSize":[426.6666666666667,240],"mapPx":[320,240],"zoom":1.5},"boss":{"active":true,"hp":12,"name":"Distancia","barX":160,"barY":13,"barScale":0.6666666666666666}}
+bossToxicidad: {"hp":14,"name":"Toxicidad"}
+
+--- TRANSITIONS ---
+casa->sendero: {"map":"sendero_distancia","scroll":[328,360],"player":[648,684],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
+
+--- DEATH/RESPAWN ---
+death/respawn: {"map":"sendero_distancia","scroll":[328,360],"player":[648,684],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
+
+--- HUD FIXED CHECK ---
+hud1: {"scroll":[328,360],"hearts":{"x":338,"y":370},"mapName":{"x":648,"y":368},"frag":{"x":883,"y":370}}
+hud2: {"scroll":[466,360],"hearts":{"x":476.22057918665195,"y":370},"mapName":{"x":786.220579186652,"y":368},"frag":{"x":1021.220579186652,"y":370}}
+hud follow scroll: heartsDX=138.2 heartsDY=0.0 scrollDX=138.0
+
+--- F11 ---
+F11: fs=false {"rect":[42.671875,0,1834.65625,1032],"win":[1920,1032]}
+afterF11: {"rect":[43,0,1835,1032],"win":[1920,1032],"centered":true}
+
+--- PIXEL ART CHECK ---
+pixelCheck: {"transitions":1186,"avgPerLine":59.3,"bgBand":[0,0,0,0],"W":640,"H":360}
+
+ERRORS: []
 [end]

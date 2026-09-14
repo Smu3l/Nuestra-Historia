@@ -1,0 +1,14 @@
+[start]
+OK sendero_distancia
+OK casa
+OK boss_distancia
+OK pantano_toxicidad
+OK boss_toxicidad
+OK valle_desinteres
+OK montanas_inseguridad
+OK boss_inseguridad
+OK lago_celos
+OK boss_celos
+OK reino_recuerdos
+OK boss_coleccionista
+[end]
