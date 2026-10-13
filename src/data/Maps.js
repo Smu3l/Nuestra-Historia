@@ -1,6 +1,6 @@
-﻿export const Maps = {
+export const Maps = {
   casa: {
-    name: 'Casa de MarÃ­a JosÃ©',
+    name: 'Casa de María José',
     width: 20,
     height: 15,
     bgColor: 0x2d1b69,
@@ -78,7 +78,7 @@
     height: 15,
     bgColor: 0x1a1a2e,
     playerStart: { x: 10, y: 12 },
-    tiles: generateBossArena(),
+    tiles: generateBossArena('distancia'),
     tileNames: { 0: 'tile_stone', 1: 'tile_dark', 2: 'tile_wall' },
     walls: [2],
     objects: [],
@@ -130,7 +130,7 @@
     height: 15,
     bgColor: 0x0d1f0d,
     playerStart: { x: 10, y: 12 },
-    tiles: generateBossArena(),
+    tiles: generateBossArena('toxicidad'),
     tileNames: { 0: 'tile_marsh', 1: 'tile_marsh_water', 2: 'tile_wall' },
     walls: [2],
     objects: [],
@@ -144,13 +144,13 @@
       dialogue_intro: 'toxicidad_boss_intro',
       dialogue_defeat: 'toxicidad_boss_defeat',
       fragment: 'fragment_toxicidad',
-      fragmentName: 'Fragmento de la ComprensiÃ³n',
+      fragmentName: 'Fragmento de la Comprensión',
     },
     letters: [],
   },
 
   valle_desinteres: {
-    name: 'El Valle del DesinterÃ©s',
+    name: 'El Valle del Desinterés',
     width: 80,
     height: 45,
     bgColor: 0x4a4a4a,
@@ -163,7 +163,7 @@
       { tileX: 72, tileY: 10, type: 'boss_arena', id: 'boss_desinteres', target: 'boss_desinteres' },
     ],
     npcs: [
-      { tileX: 40, tileY: 22, sprite: 'npc_child', dialogue: 'desinteres_npc1', name: 'EspÃ­ritu' },
+      { tileX: 40, tileY: 22, sprite: 'npc_child', dialogue: 'desinteres_npc1', name: 'Espíritu' },
     ],
     enemies: [
       { type: 'enemy_puppet', x: 30, y: 6, hp: 3, damage: 1, patrol: [{ x: 30, y: 6 }, { x: 34, y: 6 }] },
@@ -176,12 +176,12 @@
   },
 
   boss_desinteres: {
-    name: 'Arena del DesinterÃ©s',
+    name: 'Arena del Desinterés',
     width: 20,
     height: 15,
     bgColor: 0x2a2a2a,
     playerStart: { x: 10, y: 12 },
-    tiles: generateBossArena(),
+    tiles: generateBossArena('desinteres'),
     tileNames: { 0: 'tile_dirt', 1: 'tile_stone', 2: 'tile_wall' },
     walls: [2],
     objects: [],
@@ -191,17 +191,17 @@
       type: 'boss_desinteres',
       hp: 14,
       damage: 1,
-      name: 'DesinterÃ©s',
+      name: 'Desinterés',
       dialogue_intro: 'desinteres_boss_intro',
       dialogue_defeat: 'desinteres_boss_defeat',
       fragment: 'fragment_desinteres',
-      fragmentName: 'Fragmento de la AtenciÃ³n',
+      fragmentName: 'Fragmento de la Atención',
     },
     letters: [],
   },
 
   montanas_inseguridad: {
-    name: 'Las MontaÃ±as de la Inseguridad',
+    name: 'Las Montañas de la Inseguridad',
     width: 80,
     height: 45,
     bgColor: 0x2d1b69,
@@ -215,7 +215,7 @@
       { tileX: 72, tileY: 10, type: 'boss_arena', id: 'boss_inseguridad', target: 'boss_inseguridad' },
     ],
     npcs: [
-      { tileX: 24, tileY: 30, sprite: 'npc_elder', dialogue: 'inseguridad_npc1', name: 'ErmitaÃ±o' },
+      { tileX: 24, tileY: 30, sprite: 'npc_elder', dialogue: 'inseguridad_npc1', name: 'Ermitaño' },
     ],
     enemies: [
       { type: 'enemy_shadow', x: 16, y: 16, hp: 3, damage: 1, patrol: [{ x: 16, y: 16 }, { x: 16, y: 20 }] },
@@ -233,7 +233,7 @@
     height: 15,
     bgColor: 0x1a0d2e,
     playerStart: { x: 10, y: 12 },
-    tiles: generateBossArena(),
+    tiles: generateBossArena('inseguridad'),
     tileNames: { 0: 'tile_stone', 1: 'tile_snow', 2: 'tile_wall' },
     walls: [2],
     objects: [],
@@ -267,7 +267,7 @@
       { tileX: 74, tileY: 18, type: 'boss_arena', id: 'boss_celos', target: 'boss_celos' },
     ],
     npcs: [
-      { tileX: 36, tileY: 18, sprite: 'npc_wanderer', dialogue: 'celos_npc1', name: 'GuardiÃ¡n' },
+      { tileX: 36, tileY: 18, sprite: 'npc_wanderer', dialogue: 'celos_npc1', name: 'Guardián' },
     ],
     enemies: [
       { type: 'enemy_shadow', x: 18, y: 36, hp: 3, damage: 1, patrol: [{ x: 18, y: 36 }, { x: 22, y: 36 }] },
@@ -285,7 +285,7 @@
     height: 15,
     bgColor: 0x0a0a1e,
     playerStart: { x: 10, y: 12 },
-    tiles: generateBossArena(),
+    tiles: generateBossArena('celos'),
     tileNames: { 0: 'tile_water', 1: 'tile_island', 2: 'tile_wall' },
     walls: [2],
     objects: [],
@@ -299,7 +299,7 @@
       dialogue_intro: 'celos_boss_intro',
       dialogue_defeat: 'celos_boss_defeat',
       fragment: 'fragment_celos',
-      fragmentName: 'Fragmento de UniÃ³n',
+      fragmentName: 'Fragmento de Unión',
     },
     letters: [],
   },
@@ -328,7 +328,7 @@
     height: 15,
     bgColor: 0x0a0a1e,
     playerStart: { x: 10, y: 12 },
-    tiles: generateFinalArena(),
+    tiles: generateBossArena('coleccionista'),
     tileNames: { 0: 'tile_dark', 1: 'tile_memorial', 2: 'tile_wall' },
     walls: [2],
     objects: [],
@@ -503,14 +503,31 @@ function generateLakeMap() {
   return parseMap(rows);
 }
 
-function generateBossArena() {
+// PUNTO 6: Arenas con pilares táticos únicos por boss
+function generateBossArena(pattern = 'default') {
   const w = 20, h = 15;
   const map = [];
+  // Pilares por patrón — 4 posiciones simétricas para cobertura táctica
+  const pillarSets = {
+    default:      [[4,3],[15,3],[4,11],[15,11]],
+    distancia:    [[5,4],[14,4],[5,10],[14,10],[9,7]],           // Cruz central
+    toxicidad:    [[3,3],[16,3],[3,11],[16,11],[9,4],[9,10]],    // Hexagonal
+    desinteres:   [[6,5],[13,5],[6,9],[13,9]],                   // Cuadrado interior
+    inseguridad:  [[4,3],[15,3],[4,11],[15,11],[9,7],[9,3]],     // + central
+    celos:        [[3,4],[16,4],[3,10],[16,10],[9,2],[9,12]],    // Diagonal
+    coleccionista:[[4,3],[15,3],[4,11],[15,11],[2,7],[17,7]],   // Pasillo lateral
+  };
+  const pillars = new Set(
+    (pillarSets[pattern] || pillarSets.default).map(([px,py]) => `${px},${py}`)
+  );
+
   for (let y = 0; y < h; y++) {
     const row = [];
     for (let x = 0; x < w; x++) {
       if (y === 0 || y === h - 1 || x === 0 || x === w - 1) {
         row.push(2);
+      } else if (pillars.has(`${x},${y}`)) {
+        row.push(2); // pilar sólido
       } else {
         row.push(0);
       }

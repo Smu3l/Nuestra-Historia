@@ -8,6 +8,7 @@ export const GameState = {
   visitedMaps: [],
   playerName: 'María José',
   partnerName: 'Samuel',
+  storyCompleted: false,
 
   reset() {
     this.currentMap = 'casa';
@@ -17,6 +18,7 @@ export const GameState = {
     this.defeatedBosses = [];
     this.collectedLetters = [];
     this.visitedMaps = [];
+    this.storyCompleted = false;
   },
 
   toSaveData() {
@@ -28,6 +30,7 @@ export const GameState = {
       defeatedBosses: [...this.defeatedBosses],
       collectedLetters: [...this.collectedLetters],
       visitedMaps: [...this.visitedMaps],
+      storyCompleted: this.storyCompleted,
     };
   },
 
@@ -40,5 +43,6 @@ export const GameState = {
     this.defeatedBosses = data.defeatedBosses || [];
     this.collectedLetters = data.collectedLetters || [];
     this.visitedMaps = data.visitedMaps || [];
+    this.storyCompleted = data.storyCompleted === true;
   },
 };

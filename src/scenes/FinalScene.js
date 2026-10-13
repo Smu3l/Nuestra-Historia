@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { GameState } from '../data/GameState.js';
+import { SaveSystem } from '../systems/SaveSystem.js';
+import { SPRITE_SCALE } from '../config/Render.js';
 
 export class FinalScene extends Phaser.Scene {
   constructor() {
@@ -12,13 +14,13 @@ export class FinalScene extends Phaser.Scene {
     this.isSkipping = false;
 
     const lines = [
-      { text: 'Samuël: ...', delay: 1000, hold: 1000 },
-      { text: 'Samuël: MJ...', delay: 1000, hold: 1000 },
-      { text: 'Samuël: Sabía que ibas a encontrarme.', delay: 2000, hold: 2000 },
+      { text: 'Samuel: ...', delay: 1000, hold: 1000 },
+      { text: 'Samuel: MJ...', delay: 1000, hold: 1000 },
+      { text: 'Samuel: Sabía que ibas a encontrarme.', delay: 2000, hold: 2000 },
       { text: 'María José: Te dije que no iba a dejarte.', delay: 2000, hold: 2000 },
-      { text: 'Samuël: Nunca lo dudé.', delay: 1500, hold: 1500 },
+      { text: 'Samuel: Nunca lo dudé.', delay: 1500, hold: 1500 },
       { text: 'María José: Yo tampoco.', delay: 1500, hold: 1500 },
-      { text: 'Samuël: Gracias por no rendirte.', delay: 2000, hold: 2000 },
+      { text: 'Samuel: Gracias por no rendirte.', delay: 2000, hold: 2000 },
       { text: 'María José: Gracias por esperarme.', delay: 2000, hold: 2000 },
       { text: '...', delay: 1000, hold: 1000 },
       { text: 'Los fragmentos de recuerdo comienzan a brillar...', delay: 2000, hold: 2000 },
@@ -41,8 +43,8 @@ export class FinalScene extends Phaser.Scene {
       lineSpacing: 8,
     }).setOrigin(0.5).setAlpha(0);
 
-    const samuelSprite = this.add.sprite(240, 250, 'samuel').setScale(2).setAlpha(0);
-    const mjSprite = this.add.sprite(400, 250, 'player_down_idle_0').setScale(2).setAlpha(0);
+    const samuelSprite = this.add.sprite(240, 250, 'samuel').setScale(SPRITE_SCALE * 2).setAlpha(0);
+    const mjSprite = this.add.sprite(400, 250, 'player_down_idle_0').setScale(SPRITE_SCALE * 2).setAlpha(0);
 
     for (let i = 0; i < 20; i++) {
       const spark = this.add.sprite(
@@ -133,9 +135,15 @@ export class FinalScene extends Phaser.Scene {
     if (this._finished) return;
     this._finished = true;
 
+    // La historia terminó: se marca en el guardado para que "Continuar"
+    // quede inhabilitado y no se pueda volver a la arena del Coleccionista.
+    GameState.storyCompleted = true;
+
     this.cameras.main.fade(2000, 255, 255, 255);
     this.time.delayedCall(2500, () => {
-      this.scene.start('MenuScene');
+      new SaveSystem().save().finally(() => {
+        this.scene.start('MenuScene');
+      });
     });
   }
 }

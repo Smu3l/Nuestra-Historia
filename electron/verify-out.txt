@@ -16,7 +16,7 @@ walkU: scrollDY=-14.0 playerDY=-148 firstScroll=[78,360] lastScroll=[78,346]
 walking RIGHT 2s...
 walkR: scrollDX=229.0 firstScroll=[80,346] lastScroll=[309,346]
 walking DOWN 2s...
-walkD: scrollDY=12.0 firstScroll=[323,348] lastScroll=[326,360]
+walkD: scrollDY=10.0 firstScroll=[324,350] lastScroll=[326,360]
 after-all-walks: {"map":"sendero_distancia","scroll":[326,360],"player":[646,692],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
 edgeClamp: {"scrollX_clamped":true,"scrollY_clamped":true,"playerInView":true}
 
@@ -32,15 +32,15 @@ death/respawn: {"map":"sendero_distancia","scroll":[328,360],"player":[648,684],
 
 --- HUD FIXED CHECK ---
 hud1: {"scroll":[328,360],"hearts":{"x":338,"y":370},"mapName":{"x":648,"y":368},"frag":{"x":883,"y":370}}
-hud2: {"scroll":[466,360],"hearts":{"x":476.22057918665195,"y":370},"mapName":{"x":786.220579186652,"y":368},"frag":{"x":1021.220579186652,"y":370}}
-hud follow scroll: heartsDX=138.2 heartsDY=0.0 scrollDX=138.0
+hud2: {"scroll":[469,360],"hearts":{"x":479.27970959504864,"y":370},"mapName":{"x":789.2797095950486,"y":368},"frag":{"x":1024.2797095950486,"y":370}}
+hud follow scroll: heartsDX=141.3 heartsDY=0.0 scrollDX=141.0
 
 --- F11 ---
-F11: fs=false {"rect":[42.671875,0,1834.65625,1032],"win":[1920,1032]}
+F11: fs=false {"rect":[42.66250228881836,0,1834.6624755859375,1032],"win":[1920,1032]}
 afterF11: {"rect":[43,0,1835,1032],"win":[1920,1032],"centered":true}
 
 --- PIXEL ART CHECK ---
-pixelCheck: {"transitions":1186,"avgPerLine":59.3,"bgBand":[0,0,0,0],"W":640,"H":360}
+pixelCheck: {"transitions":1188,"avgPerLine":59.4,"bgBand":[0,0,0,0],"W":640,"H":360}
 
 ERRORS: []
 [end]

@@ -6,6 +6,11 @@ export class PreloadScene extends Phaser.Scene {
     super('PreloadScene');
   }
 
+  preload() {
+    this.load.image('mariajose_sheet', 'assets/sprites/mariajose_sheet.png');
+    this.load.image('samuel', 'assets/sprites/samuel_npc.png');
+  }
+
   create() {
     this.cameras.main.setBackgroundColor(0x0a0a1e);
 

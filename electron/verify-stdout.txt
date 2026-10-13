@@ -1,0 +1,46 @@
+
+=== VERIFICACION VISUAL v2 ===
+display {"x":0,"y":0,"width":1920,"height":1032}
+boot=true
+
+--- CASA ---
+casa: {"map":"casa","scroll":[-54,0],"player":[168,172],"inView":true,"viewSize":[426.6666666666667,240],"mapPx":[320,240],"zoom":1.5}
+dialogBox: {"bx":-46.66666519641876,"by":176.66666167974472,"bw":413.3333456516266,"bh":60.00000178813934,"cx":160.00000762939453,"cy":206.6666625738144,"scX":0.6666666666666666,"scY":0.6666666666666666}
+
+--- SENDERO: camera follow ---
+sendero start: {"map":"sendero_distancia","scroll":[328,360],"player":[648,684],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
+walking LEFT 2s...
+walkL: scrollDX=-230.0 playerDX=-236 firstScroll=[324,360] lastScroll=[94,360]
+walking UP 2s...
+walkU: scrollDY=-14.0 playerDY=-148 firstScroll=[78,360] lastScroll=[78,346]
+walking RIGHT 2s...
+walkR: scrollDX=229.0 firstScroll=[80,346] lastScroll=[309,346]
+walking DOWN 2s...
+walkD: scrollDY=10.0 firstScroll=[324,350] lastScroll=[326,360]
+after-all-walks: {"map":"sendero_distancia","scroll":[326,360],"player":[646,692],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
+edgeClamp: {"scrollX_clamped":true,"scrollY_clamped":true,"playerInView":true}
+
+--- BOSS ARENA ---
+boss: {"scene":{"map":"boss_distancia","scroll":[-54,0],"player":[168,204],"inView":true,"viewSize":[426.6666666666667,240],"mapPx":[320,240],"zoom":1.5},"boss":{"active":true,"hp":12,"name":"Distancia","barX":160,"barY":13,"barScale":0.6666666666666666}}
+bossToxicidad: {"hp":14,"name":"Toxicidad"}
+
+--- TRANSITIONS ---
+casa->sendero: {"map":"sendero_distancia","scroll":[328,360],"player":[648,684],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
+
+--- DEATH/RESPAWN ---
+death/respawn: {"map":"sendero_distancia","scroll":[328,360],"player":[648,684],"inView":true,"viewSize":[640,360],"mapPx":[1280,720],"zoom":1}
+
+--- HUD FIXED CHECK ---
+hud1: {"scroll":[328,360],"hearts":{"x":338,"y":370},"mapName":{"x":648,"y":368},"frag":{"x":883,"y":370}}
+hud2: {"scroll":[469,360],"hearts":{"x":479.27970959504864,"y":370},"mapName":{"x":789.2797095950486,"y":368},"frag":{"x":1024.2797095950486,"y":370}}
+hud follow scroll: heartsDX=141.3 heartsDY=0.0 scrollDX=141.0
+
+--- F11 ---
+F11: fs=false {"rect":[42.66250228881836,0,1834.6624755859375,1032],"win":[1920,1032]}
+afterF11: {"rect":[43,0,1835,1032],"win":[1920,1032],"centered":true}
+
+--- PIXEL ART CHECK ---
+pixelCheck: {"transitions":1188,"avgPerLine":59.4,"bgBand":[0,0,0,0],"W":640,"H":360}
+
+ERRORS: []
+[end]

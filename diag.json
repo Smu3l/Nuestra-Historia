@@ -1,0 +1,18 @@
+{
+  "info": {
+    "backing": "640x360",
+    "css": "1236x695",
+    "rect": "{\"x\":14.21875,\"y\":0,\"width\":1235.546875,\"height\":695,\"top\":0,\"right\":1249.765625,\"bottom\":695,\"left\":14.21875}",
+    "imageRendering": "pixelated",
+    "dpr": 1,
+    "displaySize": "1235.5555555555554x695",
+    "gameSize": "640x360",
+    "baseSize": "640x360",
+    "zoom": 1
+  },
+  "logs": [
+    "[0] [vite] connecting...",
+    "[0] [vite] connected.",
+    "[1] %c %c %c %c %c Phaser v3.90.0 (WebGL | Web Audio) %c https://phaser.io/v390 background: #ff0000 background: #ffff00 background: #00ff00 background: #00ffff color: #ffffff; background: #000000 background: transparent"
+  ]
+}
