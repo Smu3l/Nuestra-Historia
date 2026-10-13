@@ -1,3 +1,7 @@
+import Phaser from 'phaser';
+import { PLAYER_SPRITES } from '../data/PlayerSprites.js';
+import { SPRITE_BAKE } from '../config/Render.js';
+
 export class ProceduralAssets {
   constructor(scene) {
     this.scene = scene;
@@ -24,70 +28,226 @@ export class ProceduralAssets {
   }
 
   generatePlayer() {
+    if (this.buildPlayerFromSheet()) return;
+    this.generatePlayerProcedural();
+  }
+
+  buildPlayerFromSheet() {
+    const tex = this.scene.textures;
+    if (!tex.exists('mariajose_sheet')) return false;
+    const entries = Object.entries(PLAYER_SPRITES.frames || {});
+    if (entries.length < 44) return false;
+    if (entries.some(([key, f]) => !f || typeof f.sx !== 'number' || tex.exists(key))) {
+      return false;
+    }
+    const src = tex.get('mariajose_sheet').source[0].image;
+    if (!src) return false;
+    for (const [key, f] of entries) {
+      const canvas = tex.createCanvas(key, f.sw, f.sh);
+      const ctx = canvas.context;
+      ctx.clearRect(0, 0, f.sw, f.sh);
+      if (f.flip) {
+        ctx.save();
+        ctx.translate(f.sw, 0);
+        ctx.scale(-1, 1);
+      }
+      ctx.drawImage(src, f.sx, f.sy, f.sw, f.sh, 0, 0, f.sw, f.sh);
+      if (f.flip) ctx.restore();
+      canvas.refresh();
+      // El arte se hornea con más detalle y se dibuja reducido: filtro LINEAR
+      // para que el reescalado no muestre dientes de sierra.
+      canvas.setFilter(Phaser.Textures.FilterMode.LINEAR);
+    }
+    return true;
+  }
+
+  generatePlayerProcedural() {
+    // María José 16x24. Frente = referencia (pelo negro largo, gafas
+    // cuadradas, t-shirt blanca, pantalón negro, sneakers blancos).
     const dirs = ['down', 'up', 'left', 'right'];
+    const C = {
+      hair: '#1a1a1a', hairLight: '#2a2a2a',
+      skin: '#f1c27d', skinShade: '#e0ac69',
+      glasses: '#1a1a1a', glint: '#ffffff',
+      shirt: '#ffffff', shirtShade: '#f0f0f0',
+      pants: '#1a1a1a', pantsLine: '#000000',
+      shoe: '#ffffff', sole: '#cccccc',
+      bow: '#ff4d6d'
+    };
+    const R = (ctx, x, y, w, h, c) => {
+      ctx.fillStyle = c;
+      ctx.fillRect(Math.round(x), Math.round(y), w, h);
+    };
+    const flashWhite = (ctx, doFlash) => {
+      if (!doFlash) return;
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-atop';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 16, 24);
+      ctx.restore();
+    };
+
+    const legs = (ctx, oL, oR, pants, seam, side) => {
+      // Piernas/Falda
+      R(ctx, 5, 17 + oL, 3, 4, pants);
+      R(ctx, 8, 17 + oR, 3, 4, pants);
+      // Calcetines/Zapatos
+      R(ctx, 5, 21 + oL, 3, 2, C.shoe);
+      R(ctx, 8, 21 + oR, 3, 2, C.shoe);
+      R(ctx, 5, 23, 3, 1, C.pantsLine);
+      R(ctx, 8, 23, 3, 1, C.pantsLine);
+    };
+
+    const armsFront = (ctx, dy, aL, aR) => {
+      // Mangas blancas
+      R(ctx, 2, 12 + dy, 2, 3, C.shirt);
+      R(ctx, 12, 12 + dy, 2, 3, C.shirt);
+      // Manos piel
+      R(ctx, 2, 15 + dy + aL, 2, 2, C.skin);
+      R(ctx, 12, 15 + dy + aR, 2, 2, C.skin);
+    };
+
+    const headFront = (ctx, dy) => {
+      // Pelo fondo (caída larga)
+      R(ctx, 3, 5 + dy, 10, 11, C.hair);
+      // Cara
+      R(ctx, 4, 3 + dy, 8, 9, C.skin);
+      // Flequillo/Pelo arriba
+      R(ctx, 3, 2 + dy, 10, 3, C.hair);
+      R(ctx, 4, 1 + dy, 8, 1, C.hair);
+      // Gafas (Bloque limpio)
+      R(ctx, 4, 6 + dy, 3, 2, C.glasses);
+      R(ctx, 9, 6 + dy, 3, 2, C.glasses);
+      R(ctx, 7, 7 + dy, 2, 1, C.glasses);
+      R(ctx, 4, 6 + dy, 1, 1, C.glint);
+      R(ctx, 9, 6 + dy, 1, 1, C.glint);
+      // Lazo (Bow)
+      R(ctx, 9, 1 + dy, 3, 3, C.bow);
+    };
+
+    const torsoFront = (ctx, dy, aL, aR, swL, swR) => {
+      // Camisa blanca
+      R(ctx, 4, 12 + dy, 8, 6, C.shirt);
+      // Cuello
+      R(ctx, 7, 12 + dy, 2, 1, C.skin);
+      armsFront(ctx, dy, aL, aR);
+    };
+
+    const headBack = (ctx, dy) => {
+      // Todo pelo por detrás
+      R(ctx, 3, 1 + dy, 10, 15, C.hair);
+      R(ctx, 4, 0 + dy, 8, 1, C.hair);
+      // Lazo asomando
+      R(ctx, 4, 1 + dy, 3, 3, C.bow);
+      // Cuerpo
+      R(ctx, 4, 12 + dy, 8, 6, C.shirt);
+      armsFront(ctx, dy, 0, 0);
+    };
+
+    const headProfile = (ctx, dy, dir) => {
+      const X = (x, w) => (dir === 'left' ? x : 16 - x - w);
+      // Pelo (bloque trasero)
+      R(ctx, X(4, 5), 2 + dy, 5, 16, C.hair);
+      // Cara
+      R(ctx, X(9, 4), 3 + dy, 4, 9, C.skin);
+      // Pelo superior
+      R(ctx, X(6, 6), 2 + dy, 6, 3, C.hair);
+      // Gafa lateral
+      R(ctx, X(11, 2), 6 + dy, 2, 2, C.glasses);
+      R(ctx, X(12, 1), 6 + dy, 1, 1, C.glint);
+      // Lazo lateral
+      if (dir === 'right') R(ctx, X(7, 3), 1 + dy, 3, 3, C.bow);
+      else R(ctx, X(6, 3), 1 + dy, 3, 3, C.bow);
+    };
+
+    const torsoProfile = (ctx, dy, aF, aB, sw) => {
+      R(ctx, 4, 12 + dy, 7, 4, C.shirt);
+      R(ctx, 9, 12 + dy, 2, 4, C.shirtShade);
+      R(ctx, 2, 12 + dy + aF, 2, 2, C.shirt);
+      R(ctx, 2, 14 + dy + aF, 2, 3, C.skin);
+      R(ctx, 11, 12 + dy + aB, 2, 4, C.skinShade);
+      R(ctx, 8, 10 + dy + sw, 2, 6, C.hair);
+    };
+
+    const attackFx = (ctx, dir, dy, frame) => {
+      const ext = 2 + frame;
+      if (dir === 'down') {
+        R(ctx, 12, 14 + dy, 2, 3 + ext, C.skin);
+        R(ctx, 12, 15 + dy + ext, 2, 2, C.glint);
+      } else if (dir === 'up') {
+        R(ctx, 12, 11 + dy - ext, 2, 3 + ext, C.skin);
+        R(ctx, 12, 8 + dy - ext, 2, 2, C.glint);
+      } else if (dir === 'left') {
+        R(ctx, 2 - ext, 14 + dy, 2 + ext, 2, C.skin);
+        R(ctx, 0 - ext, 14 + dy, 2, 2, C.glint);
+      } else {
+        R(ctx, 12, 14 + dy, 2 + ext, 2, C.skin);
+        R(ctx, 14 + ext, 14 + dy, 2, 2, C.glint);
+      }
+    };
 
     const drawFrame = (ctx, dir, anim, frame) => {
-      const w = 16, h = 24;
-      const bounce = anim === 'walk' ? Math.sin(frame * Math.PI / 2) * 1.5 : 0;
-
-      ctx.fillStyle = '#deb887';
-      ctx.fillRect(5, 3, 6, 5);
-      ctx.fillStyle = '#5a3a1a';
-      ctx.fillRect(5, 1, 6, 3);
-      if (dir === 'left') ctx.fillRect(4, 2, 2, 3);
-      if (dir === 'right') ctx.fillRect(10, 2, 2, 3);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(6, 5, 1, 1);
-      ctx.fillRect(9, 5, 1, 1);
-      ctx.fillStyle = '#e84393';
-      ctx.fillRect(4, 10 + bounce, 8, 7);
-      ctx.fillStyle = '#c0392b';
-      ctx.fillRect(6, 11 + bounce, 4, 2);
-      ctx.fillStyle = '#2d1b69';
-      const legOff = anim === 'walk' ? (frame % 2 === 0 ? 1.5 : -1.5) : 0;
-      ctx.fillRect(5, 17 + bounce, 3, 6 + legOff);
-      ctx.fillRect(8, 17 + bounce, 3, 6 - legOff);
-      ctx.fillStyle = '#e17055';
-      ctx.fillRect(5, 22 + bounce + legOff, 3, 2);
-      ctx.fillRect(8, 22 + bounce - legOff, 3, 2);
-      ctx.fillStyle = '#f1c40f';
-      ctx.fillRect(6, 2, 4, 2);
-      if (anim === 'attack') {
-        ctx.fillStyle = '#ff6b9d';
-        if (dir === 'right') ctx.fillRect(13, 10, 4, 3);
-        else if (dir === 'left') ctx.fillRect(-1, 10, 4, 3);
-        else if (dir === 'up') ctx.fillRect(6, -1, 4, 4);
-        else ctx.fillRect(6, 20, 4, 4);
-        ctx.fillStyle = '#fff';
-        if (dir === 'right') ctx.fillRect(14, 11, 2, 1);
-        else if (dir === 'left') ctx.fillRect(0, 11, 2, 1);
-        else if (dir === 'up') ctx.fillRect(7, 0, 2, 1);
-        else ctx.fillRect(7, 22, 2, 1);
+      let dy = 0, oL = 0, oR = 0, aL = 0, aR = 0, sw = 0;
+      if (anim === 'idle') {
+        dy = frame;
+      } else if (anim === 'walk') {
+        const ph = frame % 2 === 0 ? 1 : -1;
+        oL = ph; oR = -ph; aL = -ph; aR = ph;
+        dy = [0, 1, 0, 1][frame];
+        sw = [0, 1, 0, -1][frame];
       }
+      const isProfile = dir === 'left' || dir === 'right';
+
+      if (!isProfile) {
+        if (dir === 'down') headFront(ctx, dy);
+        else headBack(ctx, dy);
+        if (anim === 'attack') {
+          torsoFront(ctx, dy, 0, 0, 0, 0);
+          attackFx(ctx, dir, dy, frame);
+        } else {
+          torsoFront(ctx, dy, aL, aR, sw, -sw);
+        }
+        legs(ctx, oL, oR, C.pants, C.pantsLine, null);
+      } else {
+        headProfile(ctx, dy, dir);
+        if (anim === 'attack') {
+          torsoProfile(ctx, dy, 0, 0, 0);
+          attackFx(ctx, dir, dy, frame);
+        } else {
+          const aF = dir === 'left' ? aL : aR;
+          torsoProfile(ctx, dy, aF, -aF, sw);
+        }
+        legs(ctx, oL, oR, C.pants, C.pantsLine, null);
+      }
+      if (anim === 'hurt') flashWhite(ctx, frame === 1);
     };
 
     dirs.forEach(dir => {
       // idle: 2 frames
       for (let f = 0; f < 2; f++) {
-        this.createTexture(`player_${dir}_idle_${f}`, 16, 24, (ctx) => {
+        this.createTexture(`player_${dir}_idle_${f}`, 16 * SPRITE_BAKE, 24 * SPRITE_BAKE, (ctx) => {
+          ctx.scale(SPRITE_BAKE, SPRITE_BAKE);
           drawFrame(ctx, dir, 'idle', f);
         });
       }
       // walk: 4 frames
       for (let f = 0; f < 4; f++) {
-        this.createTexture(`player_${dir}_walk_${f}`, 16, 24, (ctx) => {
+        this.createTexture(`player_${dir}_walk_${f}`, 16 * SPRITE_BAKE, 24 * SPRITE_BAKE, (ctx) => {
+          ctx.scale(SPRITE_BAKE, SPRITE_BAKE);
           drawFrame(ctx, dir, 'walk', f);
         });
       }
       // attack: 3 frames
       for (let f = 0; f < 3; f++) {
-        this.createTexture(`player_${dir}_attack_${f}`, 16, 24, (ctx) => {
+        this.createTexture(`player_${dir}_attack_${f}`, 16 * SPRITE_BAKE, 24 * SPRITE_BAKE, (ctx) => {
+          ctx.scale(SPRITE_BAKE, SPRITE_BAKE);
           drawFrame(ctx, dir, 'attack', f);
         });
       }
       // hurt: 2 frames
       for (let f = 0; f < 2; f++) {
-        this.createTexture(`player_${dir}_hurt_${f}`, 16, 24, (ctx) => {
+        this.createTexture(`player_${dir}_hurt_${f}`, 16 * SPRITE_BAKE, 24 * SPRITE_BAKE, (ctx) => {
+          ctx.scale(SPRITE_BAKE, SPRITE_BAKE);
           drawFrame(ctx, dir, 'hurt', f);
         });
       }
@@ -352,27 +512,11 @@ export class ProceduralAssets {
   }
 
   generateSamuel() {
-    this.createTexture('samuel', 16, 24, (ctx) => {
-      ctx.fillStyle = '#deb887';
-      ctx.fillRect(4, 2, 8, 8);
-      ctx.fillStyle = '#5a3a1a';
-      ctx.fillRect(4, 0, 8, 4);
-      ctx.fillRect(3, 1, 2, 4);
-      ctx.fillStyle = '#0984e3';
-      ctx.fillRect(3, 10, 10, 8);
-      ctx.fillStyle = '#deb887';
-      ctx.fillRect(4, 11, 3, 4);
-      ctx.fillRect(9, 11, 3, 4);
-      ctx.fillStyle = '#2d3436';
-      ctx.fillRect(5, 18, 3, 6);
-      ctx.fillRect(8, 18, 3, 6);
-      ctx.fillStyle = '#333';
-      ctx.fillRect(6, 5, 2, 2);
-      ctx.fillRect(9, 5, 2, 2);
-      ctx.fillStyle = '#c0392b';
-      ctx.fillRect(7, 7, 2, 1);
-    });
-
+    if (!this.scene.textures.exists('samuel')) {
+      this.generateSamuelProcedural();
+    }
+    // Samuel también se hornea con más detalle y se dibuja reducido.
+    this.scene.textures.get('samuel').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.createTexture('samuel_glow', 32, 32, (ctx) => {
       const grad = ctx.createRadialGradient(16, 16, 4, 16, 16, 16);
       grad.addColorStop(0, 'rgba(241, 196, 15, 0.8)');
@@ -380,6 +524,47 @@ export class ProceduralAssets {
       grad.addColorStop(1, 'rgba(241, 196, 15, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 32, 32);
+    });
+  }
+
+  generateSamuelProcedural() {
+    const C = {
+      hair: '#6d4c41', hairLight: '#8d6e63',
+      skin: '#f1c27d', skinShade: '#e0ac69',
+      shirt: '#3498db', shirtShade: '#2980b9',
+      jeans: '#34495e', jeansShade: '#2c3e50',
+      shoe: '#ffffff', sole: '#cccccc',
+      outline: '#1a1a1a'
+    };
+    const R = (ctx, x, y, w, h, c) => {
+      ctx.fillStyle = c;
+      ctx.fillRect(x, y, w, h);
+    };
+    this.createTexture('samuel', 16 * SPRITE_BAKE, 24 * SPRITE_BAKE, (ctx) => {
+      ctx.scale(SPRITE_BAKE, SPRITE_BAKE);
+      // Pelo (forma definida)
+      R(ctx, 4, 1, 8, 4, C.hair);
+      R(ctx, 3, 2, 10, 2, C.hair);
+      R(ctx, 5, 0, 6, 1, C.hair);
+      // Cara
+      R(ctx, 4, 4, 8, 8, C.skin);
+      // Ojos
+      R(ctx, 5, 7, 1, 1, '#1a1a1a');
+      R(ctx, 10, 7, 1, 1, '#1a1a1a');
+      // Camiseta Azul
+      R(ctx, 4, 12, 8, 6, C.shirt);
+      R(ctx, 10, 12, 2, 6, C.shirtShade);
+      // Brazos
+      R(ctx, 2, 12, 2, 3, C.shirt);
+      R(ctx, 12, 12, 2, 3, C.shirt);
+      R(ctx, 2, 15, 2, 2, C.skin);
+      R(ctx, 12, 15, 2, 2, C.skin);
+      // Pantalones
+      R(ctx, 5, 18, 3, 4, C.jeans);
+      R(ctx, 8, 18, 3, 4, C.jeans);
+      // Zapatos
+      R(ctx, 5, 22, 3, 2, C.shoe);
+      R(ctx, 8, 22, 3, 2, C.shoe);
     });
   }
 }

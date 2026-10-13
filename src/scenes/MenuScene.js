@@ -124,11 +124,15 @@ export class MenuScene extends Phaser.Scene {
 
     const saveSystem = new SaveSystem();
     saveSystem.hasSave().then(hasSave => {
-      if (hasSave && this.scene.isActive('MenuScene')) {
+      if (!hasSave || !this.scene.isActive('MenuScene')) return;
+      // Si la historia ya terminó, "Continuar" no se habilita.
+      saveSystem.load().then(loaded => {
+        if (!loaded || !this.scene.isActive('MenuScene')) return;
+        if (GameState.storyCompleted) return;
         this.continueOption.btn.setVisible(true).setAlpha(1).setInteractive({ useHandCursor: true });
         this.continueOption.label.setVisible(true).setAlpha(1);
         this.refreshVisibleOptions();
-      }
+      });
     }).catch(() => {});
   }
 
@@ -174,12 +178,17 @@ export class MenuScene extends Phaser.Scene {
 
   newGame() {
     GameState.reset();
+    // Se sobrescribe el guardado con el estado inicial: al empezar una nueva
+    // historia, "Continuar" vuelve a estar disponible.
+    new SaveSystem().save().catch(() => {});
     this.scene.start('IntroScene');
   }
 
   continueGame() {
     const saveSystem = new SaveSystem();
-    saveSystem.load().then(() => {
+    saveSystem.load().then(loaded => {
+      // Bloqueo de seguridad: nunca se entra con la historia ya terminada.
+      if (!loaded || GameState.storyCompleted) return;
       this.scene.start('GameScene');
     });
   }

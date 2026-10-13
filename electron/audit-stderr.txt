@@ -1,0 +1,7 @@
+[10164:0914/140425.156:INFO:CONSOLE(462)] "%c %c %c %c %c Phaser v3.90.0 (WebGL | Web Audio) %c https://phaser.io/v390 background: #ff0000 background: #ffff00 background: #00ff00 background: #00ffff color: #ffffff; background: #000000 background: transparent", source: file:///C:/Users/Samuel/Documents/Nuestra-Historia/dist/assets/index-DRWVP9qh.js (462)
+Error occurred in handler for 'has-save': Error: No handler registered for 'has-save'
+    at WebContents.<anonymous> (node:electron/js2c/browser_init:2:83837)
+    at WebContents.emit (node:events:519:28)
+Error occurred in handler for 'has-save': Error: No handler registered for 'has-save'
+    at WebContents.<anonymous> (node:electron/js2c/browser_init:2:83837)
+    at WebContents.emit (node:events:519:28)

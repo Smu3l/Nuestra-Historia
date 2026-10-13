@@ -8,6 +8,27 @@ import { Boss } from '../entities/Boss.js';
 import { DialogueSystem } from '../systems/DialogueSystem.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
 import { HUD } from '../ui/HUD.js';
+import { RENDER_SCALE, CAM_OFFSET_X, CAM_OFFSET_Y } from '../config/Render.js';
+
+// Aviso al desbloquear cada habilidad (nombre + tecla/uso).
+const ABILITY_UNLOCK = {
+  fragment_distancia: {
+    name: 'Dash - Evasión rápida',
+    hint: 'Pulsa SHIFT o haz doble-tap en WASD/flechas',
+  },
+  fragment_toxicidad: {
+    name: 'Ataque amplio',
+    hint: 'Pasiva: tus ataques con ESPACIO llegan más lejos',
+  },
+  fragment_inseguridad: {
+    name: 'Corazón extra',
+    hint: 'Pasiva: +1 corazón permanente',
+  },
+  fragment_celos: {
+    name: 'Aura expansiva',
+    hint: 'Pasiva: cada ataque daña a enemigos cercanos',
+  },
+};
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -23,6 +44,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.isDialogActive = false;
     this._deathInProgress = false;
+    this._finalStarted = false;
     this.interactables = [];
     this.npcSprites = [];
     this.enemySprites = [];
@@ -30,6 +52,7 @@ export class GameScene extends Phaser.Scene {
 
     this.dialogueSystem = new DialogueSystem(this);
     this.dialogueSystem.create();
+    this.saveSystem = new SaveSystem();
 
     this.mapGroup = this.physics.add.staticGroup();
     this.loadMap(this.targetMap);
@@ -49,19 +72,64 @@ export class GameScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-    this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.sKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    // PUNTO 9: Shift para dash
+    this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
+    // PUNTO 1: Doble-tap para dash. Se usa el teclado global (los
+    // listeners keyboard.on se limpian al reiniciar la escena; los
+    // objetos Key sueltos acumularían handlers entre restarts).
+    this._lastDirTap = { key: null, time: 0 };
+    const dashDirMap = {
+      W: [0, -1], UP: [0, -1], S: [0, 1], DOWN: [0, 1],
+      A: [-1, 0], LEFT: [-1, 0], D: [1, 0], RIGHT: [1, 0],
+    };
+    Object.keys(dashDirMap).forEach(k => {
+      this.input.keyboard.on(`keydown-${k}`, () => {
+        if (this.isDialogActive) return;
+        const now = this.time.now;
+        if (this._lastDirTap.key === k && now - this._lastDirTap.time < 250) {
+          // Doble tap — disparar dash en esa dirección
+          const [dx, dy] = dashDirMap[k];
+          this.player.dash(dx, dy);
+          this._lastDirTap = { key: null, time: 0 };
+        } else {
+          this._lastDirTap = { key: k, time: now };
+        }
+      });
+    });
+
+    // Ataque (SPACE) — sencillo o cargado
     this.input.keyboard.on('keydown-SPACE', (event) => {
       if (event.repeat) return;
       if (this.isDialogActive) {
         this.dialogueSystem.advance();
       } else {
-        this.player.attack();
+        // Registrar inicio de carga
+        this._spaceDownTime = this.time.now;
       }
+    });
+
+    this.input.keyboard.on('keyup-SPACE', (event) => {
+      if (this.isDialogActive) return;
+      const held = this.time.now - (this._spaceDownTime || 0);
+      this._spaceDownTime = 0;
+      if (held >= 500) {
+        // Ataque cargado
+        this.player.chargeTime = held;
+        this.player.attack(true);
+      } else {
+        this.player.attack(false);
+      }
+    });
+
+    // Shift = dash instantáneo en dirección actual
+    this.input.keyboard.on('keydown-SHIFT', (event) => {
+      if (event.repeat || this.isDialogActive) return;
+      this.player.dash(0, 0);
     });
 
     this.input.keyboard.on('keydown-E', (event) => {
@@ -86,7 +154,8 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    this.escKey.on('down', () => {
+    this.input.keyboard.on('keydown-ESC', (event) => {
+      if (event.repeat) return;
       if (this.isDialogActive) {
         this.dialogueSystem.hide();
       } else {
@@ -124,6 +193,8 @@ export class GameScene extends Phaser.Scene {
 
     if (!GameState.visitedMaps.includes(this.targetMap)) {
       GameState.visitedMaps.push(this.targetMap);
+      // PUNTO 7: Mostrar nombre del mapa como "pantalla de llegada" al entrar por primera vez
+      this._showWorldMapHint(this.targetMap);
     }
 
     GameState.currentMap = this.targetMap;
@@ -132,6 +203,7 @@ export class GameScene extends Phaser.Scene {
 
     this.checkTriggers();
     this.maybeSpawnArenaReturnPortal();
+    this.maybeGoFinalScene();
     this.createAmbientEffects();
 
     this.cameras.main.fadeIn(500);
@@ -325,7 +397,29 @@ export class GameScene extends Phaser.Scene {
           repeat: -1,
           ease: 'Sine.easeInOut',
         });
-
+        // MEJORA MENOR: Partículas giratorias para hacer las cartas más visibles
+        for (let i = 0; i < 3; i++) {
+          const angle0 = (i / 3) * Math.PI * 2;
+          const orbit = this.add.sprite(
+            lx + Math.cos(angle0) * 10,
+            ly + Math.sin(angle0) * 10,
+            'sparkle'
+          );
+          orbit.setTint(0xf1c40f);
+          orbit.setScale(0.5);
+          orbit.setDepth(6);
+          orbit.setAlpha(0.7);
+          let angle = angle0;
+          this.time.addEvent({
+            delay: 50,
+            repeat: -1,
+            callback: () => {
+              angle += 0.08;
+              orbit.x = lx + Math.cos(angle) * 12;
+              orbit.y = (ly - 3) + Math.sin(angle) * 8;
+            },
+          });
+        }
         const zone = this.add.zone(lx, ly, 16, 16);
         this.physics.add.existing(zone, true);
         zone.interactType = 'letter';
@@ -379,12 +473,35 @@ export class GameScene extends Phaser.Scene {
     const mapH = this.currentMapData.height * 16;
 
     cam.setBackgroundColor(this.currentMapData.bgColor);
-    cam.setZoom(this.computeCameraZoom(mapW, mapH));
+    // El zoom "de juego" (1 o 2) se multiplica por RENDER_SCALE porque el
+    // canvas real es más grande; el layout lógico sigue midiendo 640x360.
+    const baseZoom = this.computeCameraZoom(mapW, mapH);
+    cam.setZoom(baseZoom * RENDER_SCALE);
 
     this._camMapW = mapW;
     this._camMapH = mapH;
-    this._camSX = this.player ? this.player.x - 320 / cam.zoom : 0;
-    this._camSY = this.player ? this.player.y - 180 / cam.zoom : 0;
+
+    const viewW = 640 / baseZoom;
+    const viewH = 360 / baseZoom;
+
+    if (mapW <= viewW || mapH <= viewH) {
+      // Mapa chico: cámara fija centrada, sin follow ni lerp.
+      // El zoom pivota en el centro del canvas (origen 0.5 de Phaser),
+      // así que el scroll se calcula contra el tamaño base 640x360
+      // (equivale a centerOn(mapW/2, mapH/2)). Para casa: (-160, -60).
+      this._camFixed = true;
+      this._camSX = (mapW - 640) / 2;
+      this._camSY = (mapH - 360) / 2;
+    } else {
+      // Mapa grande: seguimiento manual con deadzone.
+      this._camFixed = false;
+      this._camSX = this.player
+        ? Phaser.Math.Clamp(this.player.x - viewW / 2, 0, mapW - viewW)
+        : 0;
+      this._camSY = this.player
+        ? Phaser.Math.Clamp(this.player.y - viewH / 2, 0, mapH - viewH)
+        : 0;
+    }
 
     this.updateCamera();
   }
@@ -400,31 +517,81 @@ export class GameScene extends Phaser.Scene {
     if (!this.player) return;
 
     const cam = this.cameras.main;
-    const zoom = cam.zoom;
-    const viewW = 640 / zoom;
-    const viewH = 360 / zoom;
+    // cam.zoom incluye RENDER_SCALE; el layout lógico sigue siendo 640x360.
+    const baseZoom = cam.zoom / RENDER_SCALE;
+    const viewW = 640 / baseZoom;
+    const viewH = 360 / baseZoom;
     const mapW = this._camMapW;
     const mapH = this._camMapH;
 
-    let tx = this.player.x - viewW / 2;
-    let ty = this.player.y - viewH / 2;
+    // Jugador siempre dentro del mundo: nunca medio cortado en paredes/puerta.
+    if (this.player.body) {
+      const cx = Phaser.Math.Clamp(this.player.x, 8, mapW - 8);
+      const cy = Phaser.Math.Clamp(this.player.y, 8, mapH - 8);
+      if (cx !== this.player.x || cy !== this.player.y) {
+        this.player.body.reset(cx, cy);
+      }
+    }
 
-    if (mapW < viewW || mapH < viewH) {
-      this._camSX = (mapW - viewW) / 2;
-      this._camSY = (mapH - viewH) / 2;
-      cam.setScroll(this._camSX, this._camSY);
+    if (this._camFixed) {
+      // Mapa chico: scroll fijo centrado, una sola vez y siempre igual.
+      // Cero follow, cero deadzone, cero lerp.
+      this._camSX = (mapW - 640) / 2;
+      this._camSY = (mapH - 360) / 2;
+      cam.setScroll(this._camSX - CAM_OFFSET_X, this._camSY - CAM_OFFSET_Y);
       return;
     }
 
-    tx = Phaser.Math.Clamp(tx, 0, mapW - viewW);
-    ty = Phaser.Math.Clamp(ty, 0, mapH - viewH);
+    const fixedX = mapW <= viewW;
+    const fixedY = mapH <= viewH;
 
-    this._camSX += (tx - this._camSX) * 0.14;
-    this._camSY += (ty - this._camSY) * 0.14;
-    if (Math.abs(tx - this._camSX) < 0.1) this._camSX = tx;
-    if (Math.abs(ty - this._camSY) < 0.1) this._camSY = ty;
+    if (fixedX && fixedY) {
+      // Respaldo por ejes: mapa chico aunque _camFixed se haya perdido.
+      this._camSX = (mapW - 640) / 2;
+      this._camSY = (mapH - 360) / 2;
+      cam.setScroll(this._camSX - CAM_OFFSET_X, this._camSY - CAM_OFFSET_Y);
+      return;
+    }
 
-    cam.setScroll(this._camSX, this._camSY);
+    // Deadzone: jugador puede moverse libremente en esta zona central sin que la cámara mueva.
+    // El tamaño de la deadzone es el 10% del viewport en cada eje para mayor fluidez.
+    const deadzoneX = viewW * 0.10;
+    const deadzoneY = viewH * 0.10;
+
+    // scrollX está desplazado por RENDER_SCALE: se devuelve al espacio lógico.
+    const screenCenterX = cam.scrollX + CAM_OFFSET_X + viewW / 2;
+    const screenCenterY = cam.scrollY + CAM_OFFSET_Y + viewH / 2;
+
+    let tx = Phaser.Math.Clamp(this.player.x - viewW / 2, 0, Math.max(0, mapW - viewW));
+    let ty = Phaser.Math.Clamp(this.player.y - viewH / 2, 0, Math.max(0, mapH - viewH));
+
+    // Si el jugador está dentro de la deadzone, cámara quieta (no mover scroll).
+    // Si sale de la deadzone, mover cámara hacia jugador (clamped al mundo).
+    if (Math.abs(this.player.x - screenCenterX) > deadzoneX || Math.abs(this.player.y - screenCenterY) > deadzoneY) {
+      // Mover cámara hacia jugador
+      if (!fixedX) {
+        tx = Phaser.Math.Clamp(this.player.x - viewW / 2, 0, mapW - viewW);
+        // Añadir suavizado lerp
+        this._camSX += (tx - this._camSX) * 0.14;
+        if (Math.abs(tx - this._camSX) < 0.1) this._camSX = tx;
+        this._camSX = Phaser.Math.Clamp(this._camSX, 0, mapW - viewW);
+      }
+      if (!fixedY) {
+        ty = Phaser.Math.Clamp(this.player.y - viewH / 2, 0, mapH - viewH);
+        this._camSY += (ty - this._camSY) * 0.14;
+        if (Math.abs(ty - this._camSY) < 0.1) this._camSY = ty;
+        this._camSY = Phaser.Math.Clamp(this._camSY, 0, mapH - viewH);
+      }
+    } else {
+      // Jugador dentro de deadzone: cámara quieta (mantener _camSX/_camSY actuales).
+      // Asegurar que no se salga del mundo si ya estaba moviéndose.
+      if (!fixedX) this._camSX = Phaser.Math.Clamp(this._camSX, 0, mapW - viewW);
+      else this._camSX = (mapW - 640) / 2;
+      if (!fixedY) this._camSY = Phaser.Math.Clamp(this._camSY, 0, mapH - viewH);
+      else this._camSY = (mapH - 360) / 2;
+    }
+
+    cam.setScroll(this._camSX - CAM_OFFSET_X, this._camSY - CAM_OFFSET_Y);
   }
 
   setupCollisions() {
@@ -447,36 +614,40 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    this.enemySprites.forEach(enemy => {
-      if (!enemy.active) return;
-
-      this.time.addEvent({
-        delay: 100,
-        repeat: -1,
-        callback: () => {
-          if (!enemy.active || enemy.isDead || !this.player.attackHitbox) return;
+    // Un solo temporizador recorre los enemigos VIVOS cada 100ms (cubre
+    // también a los invocados a mitad de combate, que antes eran
+    // inmatables al no existir cuando se creó la escena).
+    this.time.addEvent({
+      delay: 100,
+      repeat: -1,
+      callback: () => {
+        if (!this.player || !this.player.attackHitbox) return;
+        for (const enemy of this.enemySprites) {
+          if (!enemy.active || enemy.isDead || !this.player.attackHitbox) continue;
           if (this.physics.overlap(this.player.attackHitbox, enemy)) {
-            enemy.takeDamage(1);
-            this.player.attackHitbox.destroy();
-            this.player.attackHitbox = null;
+            const dmg = this.player.attackHitbox.attackDamage || 1;
+            enemy.takeDamage(dmg);
+            if (this.player.attackHitbox) {
+              this.player.attackHitbox.destroy();
+              this.player.attackHitbox = null;
+            }
+            break;
           }
-        },
-      });
+        }
+        if (this.currentBoss && !this.currentBoss.isDead && this.player.attackHitbox) {
+          if (this.physics.overlap(this.player.attackHitbox, this.currentBoss)) {
+            const dmg = this.player.attackHitbox.attackDamage || 1;
+            this.currentBoss.takeDamage(dmg);
+            if (this.player.attackHitbox) {
+              this.player.attackHitbox.destroy();
+              this.player.attackHitbox = null;
+            }
+          }
+        }
+      },
     });
 
     if (this.currentBoss && !this.currentBoss.isDead) {
-      this.time.addEvent({
-        delay: 100,
-        repeat: -1,
-        callback: () => {
-          if (!this.currentBoss || this.currentBoss.isDead || !this.player.attackHitbox) return;
-          if (this.physics.overlap(this.player.attackHitbox, this.currentBoss)) {
-            this.currentBoss.takeDamage(1);
-            this.player.attackHitbox.destroy();
-            this.player.attackHitbox = null;
-          }
-        },
-      });
 
       this.physics.add.overlap(this.player, this.currentBoss, () => {
         if (!this.currentBoss.isDead && !this.player.invincible && !this.player.isHurt) {
@@ -604,6 +775,7 @@ export class GameScene extends Phaser.Scene {
       down: this.sKey.isDown || this.cursors.down.isDown,
       left: this.aKey.isDown || this.cursors.left.isDown,
       right: this.dKey.isDown || this.cursors.right.isDown,
+      chargeHeld: this.spaceKey.isDown,
     };
 
     this.player.update(cursorKeys, time, delta);
@@ -629,16 +801,19 @@ export class GameScene extends Phaser.Scene {
   collectLetter(letterId) {
     if (GameState.collectedLetters.includes(letterId)) return;
     GameState.collectedLetters.push(letterId);
+    if (this.saveSystem) this.saveSystem.save();
 
     const lines = Dialogues.letters[letterId] || ['Carta encontrada.'];
     this.dialogueSystem.show(lines);
   }
 
   collectFragment(fragmentData) {
+    if (this.saveSystem) this.saveSystem.save();
     this.showDialogue(Dialogues[fragmentData] || ['Fragmento obtenido.']);
   }
 
   changeMap(targetMap, spawnX, spawnY) {
+    if (this.saveSystem) this.saveSystem.save();
     this.cameras.main.fade(500, 0, 0, 0);
     this.time.delayedCall(600, () => {
       this.scene.restart({ map: targetMap, spawnX, spawnY });
@@ -658,14 +833,28 @@ export class GameScene extends Phaser.Scene {
   }
 
   showFragmentScene(fragmentId, fragmentName) {
+    if (this.saveSystem) this.saveSystem.save();
     const lines = Dialogues[fragmentId] || ['Fragmento obtenido.'];
-    this.dialogueSystem.show(lines, () => {
+    const unlock = ABILITY_UNLOCK[fragmentId];
+    const goMemory = () => {
       this.cameras.main.fade(800, 255, 246, 210);
       const returnX = Math.floor(this.player.x / 16);
       const returnY = Math.floor(this.player.y / 16);
       this.time.delayedCall(1000, () => {
         this.scene.start('MemoryScene', { fragmentId, fragmentName, returnMap: this.currentMapId, returnX, returnY });
       });
+    };
+    // Al cerrar el diálogo del fragmento se muestra el aviso de
+    // habilidad (usa la cola de diálogos: nunca se pierde).
+    this.dialogueSystem.show(lines, () => {
+      if (unlock) {
+        this.dialogueSystem.show(
+          [`¡Habilidad desbloqueada!: ${unlock.name}. ${unlock.hint}.`],
+          goMemory
+        );
+      } else {
+        goMemory();
+      }
     });
   }
 
@@ -683,13 +872,14 @@ export class GameScene extends Phaser.Scene {
     const zone = this.add.zone(x, y, 16, 16);
     this.physics.add.existing(zone, true);
     this.physics.add.overlap(this.player, zone, () => {
-      this.player.heal(2);
+      this.player.heal(3);
       heart.destroy();
       zone.destroy();
     });
   }
 
   handleBossDefeated(X, Y) {
+    if (this.saveSystem) this.saveSystem.save();
     const posX = X ?? 320;
     const posY = Y ?? 200;
 
@@ -719,6 +909,21 @@ export class GameScene extends Phaser.Scene {
     if (this.currentBoss) return;
     if (!GameState.defeatedBosses.includes(boss.type)) return;
     this.handleBossDefeated(this.player.x, this.player.y - 16);
+  }
+
+  // Red de seguridad: si el Coleccionista ya cayó pero seguimos en su
+  // arena (p. ej. muerte durante la cinemática), ir al Final igual.
+  maybeGoFinalScene() {
+    if (this.currentMapId !== 'boss_coleccionista') return;
+    if (this.currentBoss || this._finalStarted) return;
+    if (!GameState.defeatedBosses.includes('boss_coleccionista')) return;
+    this._finalStarted = true;
+    this.time.delayedCall(1000, () => {
+      this.cameras.main.fade(1000, 0, 0, 0);
+      this.time.delayedCall(1200, () => {
+        this.scene.start('FinalScene');
+      });
+    });
   }
 
   showReturnPortal(targetMap, spawnX, spawnY, x = 320, y = 200) {
@@ -763,6 +968,92 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.overlap(this.player, portalZone, () => {
       indicator.setVisible(true);
+    });
+  }
+
+  _showWorldMapHint(mapId) {
+    if (mapId === 'casa' || mapId.startsWith('boss_')) return;
+
+    const realms = [
+      { id: 'sendero_distancia', name: 'Sendero de la Distancia' },
+      { id: 'pantano_toxicidad', name: 'Pantano de la Toxicidad' },
+      { id: 'valle_desinteres', name: 'Valle del Desinterés' },
+      { id: 'montanas_inseguridad', name: 'Montañas de la Inseguridad' },
+      { id: 'lago_celos', name: 'Lago de los Celos' },
+      { id: 'reino_recuerdos', name: 'Reino de los Recuerdos' },
+    ];
+
+    const cam = this.cameras.main;
+    const z = cam.zoom || 1;
+    const s = RENDER_SCALE / z;
+    const X = (c) => (RENDER_SCALE * (c + 320 * (z - 1))) / z;
+    const Y = (c) => (RENDER_SCALE * (c + 180 * (z - 1))) / z;
+
+    const container = this.add.container(X(320), Y(180)).setScale(s).setDepth(290).setScrollFactor(0);
+
+    const bg = this.add.rectangle(0, 0, 500, 130, 0x0a0a1e, 0.92);
+    bg.setStrokeStyle(2, 0xc4a35a, 0.9);
+    container.add(bg);
+
+    const title = this.add.text(0, -42, '✦ NUEVO REINO DESCUBIERTO ✦', {
+      fontSize: '9px', color: '#c4a35a', fontFamily: 'monospace', fontStyle: 'bold'
+    }).setOrigin(0.5);
+    container.add(title);
+
+    const curRealm = realms.find(r => r.id === mapId);
+    const realmName = this.add.text(0, -22, curRealm ? curRealm.name : (this.currentMapData?.name || ''), {
+      fontSize: '13px', color: '#f1c40f', fontFamily: 'monospace', fontStyle: 'bold'
+    }).setOrigin(0.5);
+    container.add(realmName);
+
+    const startX = -180;
+    const spacing = realms.length > 1 ? 360 / (realms.length - 1) : 0;
+    realms.forEach((r, idx) => {
+      const rx = startX + idx * spacing;
+      const isVisited = GameState.visitedMaps.includes(r.id);
+      const isCurrent = r.id === mapId;
+
+      if (idx > 0) {
+        const line = this.add.line(0, 0, rx - spacing, 10, rx, 10, isVisited ? 0xf1c40f : 0x555555);
+        line.setLineWidth(2);
+        container.add(line);
+      }
+
+      const nodeColor = isCurrent ? 0xff6b9d : (isVisited ? 0xf1c40f : 0x444444);
+      const node = this.add.circle(rx, 10, isCurrent ? 7 : 5, nodeColor);
+      container.add(node);
+
+      if (isCurrent) {
+        this.tweens.add({
+          targets: node,
+          scale: { from: 1, to: 1.35 },
+          duration: 600,
+          yoyo: true,
+          repeat: -1,
+        });
+      }
+
+      const numText = this.add.text(rx, 26, `${idx + 1}`, {
+        fontSize: '7px', color: isCurrent ? '#ff6b9d' : (isVisited ? '#fff' : '#888'), fontFamily: 'monospace'
+      }).setOrigin(0.5);
+      container.add(numText);
+    });
+
+    const fragText = this.add.text(0, 46, `Fragmentos de memoria recuperados: ${GameState.fragments.length}/5`, {
+      fontSize: '9px', color: '#55efc4', fontFamily: 'monospace'
+    }).setOrigin(0.5);
+    container.add(fragText);
+
+    container.setAlpha(0);
+    this.tweens.add({
+      targets: container,
+      alpha: 1,
+      duration: 500,
+      hold: 2400,
+      yoyo: true,
+      onComplete: () => {
+        container.destroy();
+      },
     });
   }
 }

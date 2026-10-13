@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { RENDER_SCALE } from '../config/Render.js';
 
 export class DialogueSystem {
   constructor(scene) {
@@ -20,14 +21,18 @@ export class DialogueSystem {
   }
 
   create() {
-    const cam = this.scene.cameras.main;
-
-    this.container = this.scene.add.container(0, cam.height - 100);
+    // Caja anclada a cámara: scrollFactor 0 en contenedor e hijos,
+    // por lo que NUNCA se lee scrollX/scrollY para posicionarla.
+    // Solo se compensa el zoom (que sí afecta a todo lo que dibuja
+    // la cámara) para clavar el cuadro en canvas (320, 310).
+    this.container = this.scene.add.container(0, 0);
     this.container.setDepth(300);
     this.container.setVisible(false);
+    this.container.setScrollFactor(0);
 
     this.bg = this.scene.add.rectangle(320, 50, 620, 90, 0x000000, 0.9);
     this.bg.setStrokeStyle(2, 0xc4a35a);
+    this.bg.setScrollFactor(0);
     this.container.add(this.bg);
 
     this.nameText = this.scene.add.text(40, 10, '', {
@@ -36,6 +41,7 @@ export class DialogueSystem {
       fontFamily: 'monospace',
       fontStyle: 'bold',
     });
+    this.nameText.setScrollFactor(0);
     this.container.add(this.nameText);
 
     this.dialogText = this.scene.add.text(40, 28, '', {
@@ -45,6 +51,7 @@ export class DialogueSystem {
       wordWrap: { width: 540 },
       lineSpacing: 4,
     });
+    this.dialogText.setScrollFactor(0);
     this.container.add(this.dialogText);
 
     this.promptText = this.scene.add.text(580, 72, '▼', {
@@ -52,6 +59,7 @@ export class DialogueSystem {
       color: '#c4a35a',
       fontFamily: 'monospace',
     });
+    this.promptText.setScrollFactor(0);
     this.container.add(this.promptText);
 
     this.scene.tweens.add({
@@ -61,10 +69,21 @@ export class DialogueSystem {
       yoyo: true,
       repeat: -1,
     });
+
+    this.reposition();
   }
 
   show(dialogueLines, onComplete) {
-    if (!dialogueLines || dialogueLines.length === 0 || this.isActive) return;
+    if (!dialogueLines || dialogueLines.length === 0) return;
+
+    if (this.isActive) {
+      // Si ya hay un diálogo abierto (p. ej. fase de boss + fragmento),
+      // se encola en vez de perderse: perder el onComplete dejaba el
+      // juego sin salida (softlock tras derrotar un boss).
+      this._queue = this._queue || [];
+      this._queue.push({ lines: dialogueLines, onComplete });
+      return;
+    }
 
     this.isActive = true;
     this.currentDialogue = dialogueLines;
@@ -79,17 +98,18 @@ export class DialogueSystem {
 
   reposition() {
     const cam = this.scene.cameras.main;
-    if (!cam) return;
+    if (!cam || !this.container) return;
 
+    // Sin leer scrollX/scrollY: con scrollFactor 0 el scroll no afecta.
+    // El zoom sí afecta a todo lo dibujado (matriz de cámara), así que
+    // se compensa con escala 1/zoom y posición contra el pivote central
+    // para clavar el cuadro en canvas (320, 310) a zoom 1 y 1.5.
+    // RENDER_SCALE multiplica posición y escala (el canvas real es mayor).
     const zoom = cam.zoom;
-    const uiScale = 1 / zoom;
-    const viewW = 640 / zoom;
-    const viewH = 360 / zoom;
-
-    this.container.setScale(uiScale);
+    this.container.setScale(RENDER_SCALE / zoom);
     this.container.setPosition(
-      cam.scrollX + viewW / 2 - (640 * uiScale) / 2,
-      cam.scrollY + viewH - 100 * uiScale
+      (RENDER_SCALE * (320 * (zoom - 1))) / zoom,
+      (RENDER_SCALE * (260 + 180 * (zoom - 1))) / zoom
     );
   }
 
@@ -150,10 +170,13 @@ export class DialogueSystem {
     this.isActive = false;
     this.container.setVisible(false);
     this.scene.isDialogActive = false;
-    if (this.onComplete) {
-      const cb = this.onComplete;
-      this.onComplete = null;
-      cb();
+    const cb = this.onComplete;
+    this.onComplete = null;
+    // Si quedó diálogo encolado, se muestra ahora (conserva su callback).
+    if (this._queue && this._queue.length > 0) {
+      const next = this._queue.shift();
+      this.show(next.lines, next.onComplete);
     }
+    if (cb) cb();
   }
 }

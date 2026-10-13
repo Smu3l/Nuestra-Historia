@@ -5,9 +5,9 @@ const fs = require('fs');
 let mainWindow;
 
 function createWindow() {
-  const wa = screen.getPrimaryDisplay().workArea;
-  const width = Math.min(1920, wa.width);
-  const height = Math.min(1080, wa.height);
+  const { bounds } = screen.getPrimaryDisplay();
+  const width = Math.min(1920, bounds.width);
+  const height = Math.min(1080, bounds.height);
 
   mainWindow = new BrowserWindow({
     width,

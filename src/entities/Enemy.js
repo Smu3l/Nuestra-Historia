@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { GameState } from '../data/GameState.js';
+import { Dialogues } from '../data/Dialogues.js';
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, config) {
@@ -26,6 +28,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.interactIndicator = null;
     this.interactDialogue = null;
 
+    // PUNTO 2: Radio de detección del jugador
+    this.alertRadius = 80;
+    this.isChasing = false;
+    this.chaseTimer = 0;
+
     this.hpBarBg = scene.add.rectangle(x, y - 12, 14, 3, 0x333333);
     this.hpBar = scene.add.rectangle(x, y - 12, 14, 3, 0xe74c3c);
     this.hpBarBg.setVisible(false);
@@ -48,6 +55,42 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     if (this.isHurt) return;
 
+    const player = this.scene.player;
+
+    // PUNTO 2: Lógica de detección y persecución
+    if (player && !player.isDead) {
+      const distToPlayer = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
+
+      if (distToPlayer < this.alertRadius) {
+        // Jugador detectado: perseguir
+        this.isChasing = true;
+        this.chaseTimer = 2000; // Continúa persiguiendo 2s después de perder de vista
+      } else if (this.isChasing) {
+        this.chaseTimer -= delta;
+        if (this.chaseTimer <= 0) {
+          this.isChasing = false;
+        }
+      }
+
+      if (this.isChasing) {
+        // Perseguir al jugador
+        if (distToPlayer > 12) {
+          const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
+          this.body.setVelocity(
+            Math.cos(angle) * (this.speed * 1.4),
+            Math.sin(angle) * (this.speed * 1.4)
+          );
+        } else {
+          this.body.setVelocity(0, 0);
+        }
+        // Actualizar HP bar position mientras persigue
+        this.hpBarBg.setPosition(this.x, this.y - 12);
+        this.hpBar.setPosition(this.x - (this.hpBarOriginWidth * (1 - this.hp / this.maxHP)) / 2, this.y - 12);
+        return;
+      }
+    }
+
+    // Patrulla normal si no está persiguiendo
     if (this.patrol.length > 1) {
       const target = this.patrol[this.patrolIndex];
       const tx = target.x * 16 + 8;
@@ -79,6 +122,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.hp -= amount;
     this.isHurt = true;
+
+    // PUNTO 2: Al recibir daño, entrar en modo persecución
+    this.isChasing = true;
+    this.chaseTimer = 3000;
 
     this.setTint(0xff0000);
     this.hpBarBg.setVisible(true);
@@ -119,8 +166,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       scale: 1.5,
       duration: 400,
       onComplete: () => {
-        this.hpBarBg.destroy();
-        this.hpBar.destroy();
+        if (this.hpBarBg && this.hpBarBg.active) this.hpBarBg.destroy();
+        if (this.hpBar && this.hpBar.active) this.hpBar.destroy();
         this.destroy();
       },
     });
@@ -135,7 +182,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       onComplete: () => sparkle.destroy(),
     });
 
-    if (Math.random() < 0.3) {
+    // Drop de salud con mayor probabilidad si el jugador está bajo
+    const healChance = GameState.hp < GameState.maxHP * 0.5 ? 0.5 : 0.3;
+    if (Math.random() < healChance) {
       this.scene.spawnHealthDrop(this.x, this.y);
     }
   }

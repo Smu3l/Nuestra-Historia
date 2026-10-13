@@ -1,12 +1,12 @@
 export const Dialogues = {
   casa_mirror: [
     'María José: Mmm... parezco bien.',
-    'María José: Samuël se burlaría de mí ahora mismo.',
+    'María José: Samuel se burlaría de mí ahora mismo.',
     'María José: ¿Dónde estarás...?'
   ],
   casa_bed: [
     'María José: No es momento de dormir.',
-    'María José: Tengo que encontrar a Samuël.'
+    'María José: Tengo que encontrar a Samuel.'
   ],
   casa_desk: [
     'María José: Aquí escribíamos juntos.',
@@ -21,7 +21,7 @@ export const Dialogues = {
     'María José: Nunca imaginé que seríamos importantes el uno para el otro.'
   ],
   casa_letter_samuel: [
-    'Carta de Samuël:',
+    'Carta de Samuel:',
     '"MJ, si algún día no estoy...',
     'no te preocupes.',
     'Siempre estaré en algún lugar',
@@ -38,7 +38,7 @@ export const Dialogues = {
 
   npc_house_friend: [
     'Amiga: María José, ¿estás bien?',
-    'María José: Samuël desapareció.',
+    'María José: Samuel desapareció.',
     'Amiga: ¿Qué? ¿Cuándo?',
     'María José: No lo sé. Solo... ya no está.',
     'Amiga: Busca en los lugares que son importantes para ustedes.',
@@ -124,7 +124,7 @@ export const Dialogues = {
   inseguridad_intro: [
     'María José: Estas montañas...',
     'María José: Son tan hermosas.',
-    'María José: Samuël habría amado esto.'
+    'María José: Samuel habría amado esto.'
   ],
   inseguridad_npc1: [
     'Ermitaño: Las montañas no se miden por su altura.',
@@ -202,13 +202,13 @@ export const Dialogues = {
   ],
 
   final_scene: [
-    'Samuël: ...',
-    'Samuël: MJ...',
-    'Samuël: Sabía que ibas a encontrarme.',
+    'Samuel: ...',
+    'Samuel: MJ...',
+    'Samuel: Sabía que ibas a encontrarme.',
     'María José: Te dije que no iba a dejarte.',
-    'Samuël: Nunca lo dudé.',
+    'Samuel: Nunca lo dudé.',
     'María José: Yo tampoco.',
-    'Samuël: Gracias por no rendirte.',
+    'Samuel: Gracias por no rendirte.',
     'María José: Gracias por esperarme.',
     '',
     'Los fragmentos de recuerdo comienzan a brillar...',
@@ -250,30 +250,30 @@ export const Dialogues = {
 
   letters: {
     letter_1: [
-      'Carta de Samuël:',
+      'Carta de Samuel:',
       '"MJ, hoy vi una estrella fugaz.',
       'Pensé en ti inmediatamente.',
       'Porque contigo todo se siente mágico."'
     ],
     letter_2: [
-      'Carta de Samuël:',
+      'Carta de Samuel:',
       '"Sé que a veces discutimos.',
       'Pero cada pelea nos hace más fuertes.',
       'Si aprendemos de ella."'
     ],
     letter_3: [
-      'Carta de Samuël:',
+      'Carta de Samuel:',
       '"No tengo todas las respuestas.',
       'Pero contigo quiero descubrirlas."'
     ],
     letter_4: [
-      'Carta de Samuël:',
+      'Carta de Samuel:',
       '"Lo más valioso que tengo',
       'no se puede guardar en una caja.',
       'Eres tú, y lo que siento por ti."'
     ],
     letter_5: [
-      'Carta de Samuël:',
+      'Carta de Samuel:',
       '"Si algún día sientes miedo,',
       'recuerda que aquí estoy.',
       'Siempre voy a estar aquí."'
@@ -282,7 +282,7 @@ export const Dialogues = {
 
   casa_tutorial: [
     'María José: ¿Qué pasó?',
-    'María José: Samuël... ¿dónde estás?',
+    'María José: Samuel... ¿dónde estás?',
     'María José: Necesito encontrarlo.',
     'María José: Primero debo entender qué ocurrió.'
   ],
