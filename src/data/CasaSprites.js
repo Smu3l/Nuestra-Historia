@@ -21,7 +21,7 @@ export const MAP_CASA_ART = {
     { key: 'casa_puerta',     tileX: 1,  tileY: 7,  height: 36 }, // puerta > MJ
   ],
 
-  ocultarTiles: ['1,1', '4,1', '7,1', '9,1', '11,1', '2,5', '1,7'],
+  ocultarTiles: ['1,1', '4,1', '7,1', '9,1', '11,1', '1,7'],
   ocultarObjetos: ['casa_bed', 'casa_desk', 'casa_mirror', 'casa_photo', 'casa_window', 'casa_letter_samuel'],
   ocultarSalida: true,
 
