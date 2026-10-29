@@ -1,41 +1,34 @@
 export const Maps = {
   casa: {
     name: 'Casa de María José',
-    width: 20,
-    height: 15,
-    bgColor: 0x2d1b69,
-    playerStart: { x: 10, y: 10 },
+    width: 13,
+    height: 9,
+    bgColor: 0x000000,
+    playerStart: { x: 6, y: 5 },
     tiles: [
-      [15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,16,16,18,16,16,16,16,16,16,16,16,16,19,16,16,16,16,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,16,16,16,16,16,17,16,16,16,16,16,16,16,16,16,21,16,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,20,16,16,16,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,16,16,22,16,16,16,16,16,16,16,16,16,16,16,16,16,23,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15],
-      [15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15],
+      [15,15,15,15,15,15,15,15,15,15,15,15,15],
+      [15,17,16,16,20,16,16,23,16,19,16,18,15],
+      [15,16,16,16,16,16,16,16,16,16,16,16,15],
+      [15,16,16,16,16,16,16,16,16,16,16,16,15],
+      [15,16,16,16,16,16,16,16,16,16,16,16,15],
+      [15,16,21,16,16,16,16,16,16,16,16,16,15],
+      [15,16,16,16,16,16,16,16,16,16,16,16,15],
+      [15,22,16,16,16,16,16,16,16,16,16,16,15],
+      [15,15,15,15,15,15,15,15,15,15,15,15,15],
     ],
     tileNames: { 0: null, 1: 'tile_grass', 2: 'tile_dirt', 3: 'tile_stone', 4: 'tile_water', 5: 'tile_sand', 15: 'tile_wall', 16: 'tile_floor', 17: 'tile_bed', 18: 'tile_desk', 19: 'tile_mirror', 20: 'tile_photo', 21: 'tile_letter', 22: 'tile_door', 23: 'tile_window' },
     walls: [15],
     objects: [
-      { tileX: 6, tileY: 5, type: 'interact', id: 'casa_bed', sprite: 'tile_bed' },
-      { tileX: 3, tileY: 3, type: 'interact', id: 'casa_desk', sprite: 'tile_desk' },
-      { tileX: 13, tileY: 3, type: 'interact', id: 'casa_mirror', sprite: 'tile_mirror' },
-      { tileX: 14, tileY: 7, type: 'interact', id: 'casa_photo', sprite: 'tile_photo' },
-      { tileX: 16, tileY: 5, type: 'interact', id: 'casa_computer', sprite: 'tile_desk' },
-      { tileX: 2, tileY: 9, type: 'interact', id: 'casa_letter_samuel', sprite: 'tile_letter' },
-      { tileX: 3, tileY: 10, type: 'exit', target: 'sendero_distancia', spawnX: 40, spawnY: 42 },
-      { tileX: 17, tileY: 9, type: 'interact', id: 'casa_window', sprite: 'tile_lantern' },
+      { tileX: 1,  tileY: 1,  type: 'interact', id: 'casa_bed', sprite: 'tile_bed' },
+      { tileX: 4,  tileY: 1,  type: 'interact', id: 'casa_photo', sprite: 'tile_photo' },
+      { tileX: 7,  tileY: 1,  type: 'interact', id: 'casa_window', sprite: 'tile_lantern' },
+      { tileX: 9,  tileY: 1,  type: 'interact', id: 'casa_mirror', sprite: 'tile_mirror' },
+      { tileX: 11, tileY: 1,  type: 'interact', id: 'casa_desk', sprite: 'tile_desk' },
+      { tileX: 2,  tileY: 5,  type: 'interact', id: 'casa_letter_samuel', sprite: 'tile_letter' },
+      { tileX: 1,  tileY: 7,  type: 'exit', target: 'sendero_distancia', spawnX: 40, spawnY: 42 },
     ],
     npcs: [
-      { tileX: 8, tileY: 8, sprite: 'npc_elder', dialogue: 'npc_house_friend', name: 'Amiga' }
+      { tileX: 7, tileY: 5, sprite: 'npc_elder', dialogue: 'npc_house_friend', name: 'Milan' }
     ],
     enemies: [],
     boss: null,
@@ -503,31 +496,29 @@ function generateLakeMap() {
   return parseMap(rows);
 }
 
-// PUNTO 6: Arenas con pilares táticos únicos por boss
 function generateBossArena(pattern = 'default') {
   const w = 20, h = 15;
-  const map = [];
-  // Pilares por patrón — 4 posiciones simétricas para cobertura táctica
   const pillarSets = {
     default:      [[4,3],[15,3],[4,11],[15,11]],
-    distancia:    [[5,4],[14,4],[5,10],[14,10],[9,7]],           // Cruz central
-    toxicidad:    [[3,3],[16,3],[3,11],[16,11],[9,4],[9,10]],    // Hexagonal
-    desinteres:   [[6,5],[13,5],[6,9],[13,9]],                   // Cuadrado interior
-    inseguridad:  [[4,3],[15,3],[4,11],[15,11],[9,7],[9,3]],     // + central
-    celos:        [[3,4],[16,4],[3,10],[16,10],[9,2],[9,12]],    // Diagonal
-    coleccionista:[[4,3],[15,3],[4,11],[15,11],[2,7],[17,7]],   // Pasillo lateral
+    distancia:    [[5,4],[14,4],[5,10],[14,10],[9,7]],
+    toxicidad:    [[3,3],[16,3],[3,11],[16,11],[9,4],[9,10]],
+    desinteres:   [[6,5],[13,5],[6,9],[13,9]],
+    inseguridad:  [[4,3],[15,3],[4,11],[15,11],[9,7],[9,3]],
+    celos:        [[3,4],[16,4],[3,10],[16,10],[9,2],[9,12]],
+    coleccionista:[[4,3],[15,3],[4,11],[15,11],[2,7],[17,7]],
   };
   const pillars = new Set(
     (pillarSets[pattern] || pillarSets.default).map(([px,py]) => `${px},${py}`)
   );
 
+  const map = [];
   for (let y = 0; y < h; y++) {
     const row = [];
     for (let x = 0; x < w; x++) {
       if (y === 0 || y === h - 1 || x === 0 || x === w - 1) {
         row.push(2);
       } else if (pillars.has(`${x},${y}`)) {
-        row.push(2); // pilar sólido
+        row.push(2);
       } else {
         row.push(0);
       }
@@ -550,25 +541,6 @@ function generateMemoryMap() {
       } else if (x % 17 >= 2 && x % 17 <= 3 && y % 13 >= 2 && y % 13 <= 3) {
         row.push(2);
       } else if ((x * 3 + y * 7) % 31 === 0) {
-        row.push(1);
-      } else {
-        row.push(0);
-      }
-    }
-    map.push(row);
-  }
-  return map;
-}
-
-function generateFinalArena() {
-  const w = 20, h = 15;
-  const map = [];
-  for (let y = 0; y < h; y++) {
-    const row = [];
-    for (let x = 0; x < w; x++) {
-      if (y === 0 || y === h - 1 || x === 0 || x === w - 1) {
-        row.push(2);
-      } else if ((x + y) % 3 === 0) {
         row.push(1);
       } else {
         row.push(0);

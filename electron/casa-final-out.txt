@@ -1,0 +1,39 @@
+boot=true
+PASS  textura casa_cama cargada (86x119)
+PASS  textura casa_escritorio cargada (96x116)
+PASS  textura casa_mesa_fotos cargada (91x70)
+PASS  textura casa_espejo cargada (63x107)
+PASS  textura casa_puerta cargada (256x384)
+PASS  textura casa_ventana cargada (78x109)
+piezas: [{"key":"casa_cama","x":24,"y":24,"h":64,"w":46.3,"depth":24},{"key":"casa_mesa_fotos","x":168,"y":24,"h":48,"w":62.4,"depth":24},{"key":"casa_ventana","x":216,"y":24,"h":48,"w":34.3,"depth":24},{"key":"casa_espejo","x":264,"y":24,"h":48,"w":28.3,"depth":24},{"key":"casa_puerta","x":24,"y":200,"h":64,"w":42.7,"depth":200},{"key":"casa_escritorio","x":296,"y":216,"h":48,"w":39.7,"depth":216}]
+PASS  6 piezas de arte dibujadas (sin escritorio derecho duplicado)  [count=6]
+PASS  casa_cama en (24,24) h=64 (escala aumentada)  [{"key":"casa_cama","x":24,"y":24,"h":64,"w":46.3,"depth":24}]
+PASS  casa_mesa_fotos en (168,24) h=48 (escala aumentada)  [{"key":"casa_mesa_fotos","x":168,"y":24,"h":48,"w":62.4,"depth":24}]
+PASS  casa_ventana en (216,24) h=48 (escala aumentada)  [{"key":"casa_ventana","x":216,"y":24,"h":48,"w":34.3,"depth":24}]
+PASS  casa_espejo en (264,24) h=48 (escala aumentada)  [{"key":"casa_espejo","x":264,"y":24,"h":48,"w":28.3,"depth":24}]
+PASS  casa_escritorio en (296,216) h=48 (escala aumentada)  [{"key":"casa_escritorio","x":296,"y":216,"h":48,"w":39.7,"depth":216}]
+PASS  casa_puerta en (24,200) h=64 (escala aumentada)  [{"key":"casa_puerta","x":24,"y":200,"h":64,"w":42.7,"depth":200}]
+PASS  300 tiles de rejilla  [total=300]
+PASS  placeholder oculto en 1,1 cuerpo resizado a base (no 16x16)  [{"k":"1,1","visible":false,"bodyW":14,"bodyH":8}]
+PASS  placeholder oculto en 10,1 cuerpo resizado a base (no 16x16)  [{"k":"10,1","visible":false,"bodyW":14,"bodyH":6}]
+PASS  placeholder oculto en 13,1 cuerpo resizado a base (no 16x16)  [{"k":"13,1","visible":false,"bodyW":16,"bodyH":4}]
+PASS  placeholder oculto en 16,1 cuerpo resizado a base (no 16x16)  [{"k":"16,1","visible":false,"bodyW":16,"bodyH":4}]
+PASS  placeholder oculto en 18,13 cuerpo resizado a base (no 16x16)  [{"k":"18,13","visible":false,"bodyW":14,"bodyH":6}]
+PASS  placeholder oculto en 2,9 cuerpo resizado a base (no 16x16)  [{"k":"2,9","visible":false,"bodyW":10,"bodyH":6}]
+PASS  placeholder oculto en 1,12 cuerpo resizado a base (no 16x16)  [{"k":"1,12","visible":false,"bodyW":12,"bodyH":10}]
+PASS  pared visible 16x16  [{"visible":true,"w":16,"h":16}]
+hitboxes: {"cama":{"w":14,"h":8,"ox":-7,"oy":0},"mesa":{"w":14,"h":6},"ventana":{"w":16,"h":4},"espejo":{"w":16,"h":4},"escritorio":{"w":14,"h":6},"puerta":{"w":12,"h":10}}
+PASS  cama base 14x8  [{"w":14,"h":8,"ox":-7,"oy":0}]
+PASS  mesa base 14x6  [{"w":14,"h":6}]
+PASS  ventana base 16x4  [{"w":16,"h":4}]
+PASS  espejo base 16x4  [{"w":16,"h":4}]
+PASS  escritorio base 14x6  [{"w":14,"h":6}]
+PASS  puerta base 12x10  [{"w":12,"h":10}]
+ySortables: {"count":8,"infos":[{"key":"casa_cama","x":24,"y":24,"depth":24},{"key":"casa_mesa_fotos","x":168,"y":24,"depth":24},{"key":"casa_ventana","x":216,"y":24,"depth":24},{"key":"casa_espejo","x":264,"y":24,"depth":24},{"key":"casa_escritorio","x":296,"y":216,"depth":216},{"key":"casa_puerta","x":24,"y":200,"depth":200},{"key":"npc_milan","x":136,"y":144,"depth":144},{"key":"player_down_idle_0","x":168,"y":172,"depth":172}]}
+PASS  ySortables tiene 6+ elementos (jugador + 6 piezas + NPC + enemigos)  [count=8]
+PASS  Y-sorting: depth de piezas == su coordenada Y  [[{"key":"casa_cama","x":24,"y":24,"depth":24},{"key":"casa_mesa_fotos","x":168,"y":24,"depth":24},{"key":"casa_ventana","x":216,"y":24,"depth":24},{"key":"casa_espejo","x":264,"y":24,"depth":24},{"key":"casa_escritorio","x":296,"y":216,"depth":216},{"key":"casa_puerta","x":24,"y":200,"depth":200}]]
+PASS  zona de salida en (24,200) 16x16 hacia sendero_distancia  [{"x":24,"y":200,"w":16,"h":16,"target":"sendero_distancia"}]
+PASS  jugador bloqueado por cama al intentar subir (se queda en y>=32)  [{"y":38,"x":24}]
+PASS  jugador camina a la izquierda por el suelo  [{"x":81}]
+PASS  solo 1 escritorio (derecho eliminado)  [count=1]
+RESULTADO: TODOS LOS TESTS PASARON

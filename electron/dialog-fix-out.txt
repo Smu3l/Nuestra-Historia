@@ -1,0 +1,24 @@
+no habia save.json previo
+boot=true
+T1 linea1 -> name="María José" text="¿Qué pasó?" count=4
+PASS  T1: dialogo activo tras el trigger
+PASS  T1: nombre en campo propio  [María José]
+PASS  T1: solo la PRIMERA frase visible  [¿Qué pasó?]
+PASS  T1: sin concatenacion de frases  [¿Qué pasó?]
+PASS  T1: 4 lineas encoladas (no 1)  [count=4]
+PASS  T1: linea 2 secuencial y legible  ["Samuel... ¿dónde estás?"]
+PASS  T1: linea 3 secuencial y legible  ["Necesito encontrarlo."]
+PASS  T1: linea 4 secuencial y legible  ["Primero debo entender qué ocurrió."]
+PASS  T1: la caja se cierra al terminar
+T2 array -> name="María José" text="¿Qué pasó?" count=2
+PASS  T2: nombre en campo propio (antes se rompia)  [María José]
+PASS  T2: solo la 1a frase del array  [¿Qué pasó?]
+PASS  T2: NO concatenado ("¿Qué pasó?María José:...")  [¿Qué pasó?]
+PASS  T2: 2 lineas (no 1)  [count=2]
+PASS  T2: 2a frase en su propio turno  ["Samuel... ¿dónde estás?"]
+T3 fragmento -> name="" text="Fragmento de la Distancia obtenido." count=3
+PASS  T3: 1a linea del fragmento sola  [Fragmento de la Distancia obtenido.]
+PASS  T3: 3 lineas (no 1)  [count=3]
+PASS  T3: 2a linea en su propio turno  ["\"La distancia no nos separó."]
+PASS  T3: nombre "Recuerdo" en campo propio  [Recuerdo]
+RESULTADO: TODOS LOS TESTS PASARON

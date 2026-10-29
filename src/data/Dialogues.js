@@ -37,12 +37,12 @@ export const Dialogues = {
   ],
 
   npc_house_friend: [
-    'Amiga: María José, ¿estás bien?',
-    'María José: Samuel desapareció.',
-    'Amiga: ¿Qué? ¿Cuándo?',
-    'María José: No lo sé. Solo... ya no está.',
-    'Amiga: Busca en los lugares que son importantes para ustedes.',
-    'Amiga: Tal vez encuentres una pista.'
+    'Milan: ¡Guau, guau! (Mueve la cola y te mira fijamente)',
+    'María José: Tranquilo, Milan... Samuel desapareció.',
+    'Milan: (Gimotea y corre hacia la puerta)',
+    'María José: ¿Quieres que salgamos a buscarlo?',
+    'María José: Buscaré en los lugares que son importantes para nosotros.',
+    'María José: Tal vez encuentre una pista.'
   ],
 
   distancia_intro: [

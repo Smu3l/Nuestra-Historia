@@ -9,6 +9,8 @@ import { DialogueSystem } from '../systems/DialogueSystem.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
 import { HUD } from '../ui/HUD.js';
 import { RENDER_SCALE, CAM_OFFSET_X, CAM_OFFSET_Y } from '../config/Render.js';
+import { NPC_BY_NAME } from '../data/NpcSprites.js';
+import { MAP_CASA_ART } from '../data/CasaSprites.js';
 
 // Aviso al desbloquear cada habilidad (nombre + tecla/uso).
 const ABILITY_UNLOCK = {
@@ -48,6 +50,7 @@ export class GameScene extends Phaser.Scene {
     this.interactables = [];
     this.npcSprites = [];
     this.enemySprites = [];
+    this.ySortables = [];
     this.EnemyClass = Enemy;
 
     this.dialogueSystem = new DialogueSystem(this);
@@ -59,7 +62,7 @@ export class GameScene extends Phaser.Scene {
 
     const spawnHere = this.findSafeSpawn(this.currentMapData, this.spawnX ?? this.currentMapData.playerStart.x, this.spawnY ?? this.currentMapData.playerStart.y);
     this.player = new Player(this, spawnHere.x, spawnHere.y);
-    this.player.setDepth(10);
+    this.ySortables.push(this.player);
 
     this.setupCamera();
     if (this.currentBoss) {
@@ -219,6 +222,11 @@ export class GameScene extends Phaser.Scene {
     this.currentMapData = mapData;
     this.currentMapId = mapId;
 
+    // Arte definitivo de la casa: solo cambia lo que se dibuja (los
+    // placeholders se ocultan y las piezas se dibujan en sus mismos
+    // anclas); cuerpos, zonas y colisiones no se tocan.
+    const casaArt = mapId === 'casa' ? MAP_CASA_ART : null;
+
     this.mapTiles = [];
     this.interactables = [];
     this.npcSprites = [];
@@ -256,6 +264,21 @@ export class GameScene extends Phaser.Scene {
           }
 
           this.mapTiles.push(tile);
+
+          if (casaArt && casaArt.colliders && casaArt.colliders[tileId]) {
+            // Hitbox solo en la base del mueble: cuerpo duro infranqueable,
+            // pero el sprite del jugador puede superponerse por arriba al
+            // caminar detrás (perspectiva top-down).
+            const b = casaArt.colliders[tileId];
+            tile.body.setSize(b.width, b.height);
+            tile.body.setOffset(b.offsetX, b.offsetY);
+          }
+
+          if (casaArt && casaArt.ocultarTiles.includes(`${x},${y}`)) {
+            // Placeholder reemplazado por una pieza del arte: solo se
+            // oculta el dibujo; el cuerpo estático sigue intacto.
+            tile.setVisible(false);
+          }
         }
       }
     }
@@ -274,8 +297,10 @@ export class GameScene extends Phaser.Scene {
           exitZone.spawnY = obj.spawnY;
           this.interactables.push(exitZone);
 
-          const doorSprite = this.add.image(worldX, worldY, 'tile_door');
-          doorSprite.setDepth(1);
+          if (!(casaArt && casaArt.ocultarSalida)) {
+            const doorSprite = this.add.image(worldX, worldY, 'tile_door');
+            doorSprite.setDepth(1);
+          }
         } else if (obj.type === 'boss_arena') {
           const zone = this.add.zone(worldX, worldY, 16, 16);
           this.physics.add.existing(zone, true);
@@ -311,7 +336,8 @@ export class GameScene extends Phaser.Scene {
           zone.interactDialogue = obj.dialogue || obj.id;
           this.interactables.push(zone);
 
-          if (obj.sprite && this.textures.exists(obj.sprite)) {
+          if (obj.sprite && this.textures.exists(obj.sprite)
+            && !(casaArt && casaArt.ocultarObjetos.includes(obj.id))) {
             const sprite = this.add.image(worldX, worldY, obj.sprite);
             sprite.setDepth(1);
           }
@@ -331,33 +357,77 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
+    if (casaArt && casaArt.piezas) {
+      // Piezas del arte definitivo: mismo ancla que el placeholder que
+      // reemplazan (centro de casilla) y altura en mundo con la proporción
+      // original del PNG. Dibujo puro: sin cuerpos ni zonas nuevas.
+      casaArt.piezas.forEach((piece) => {
+        if (!this.textures.exists(piece.key)) return;
+        const img = this.add.image(piece.tileX * 16 + 8, piece.tileY * 16 + 8, piece.key);
+        img.setScale(piece.height / img.height);
+        this.ySortables.push(img);
+      });
+    }
+
     if (mapData.npcs) {
       mapData.npcs.forEach(npcData => {
         const nx = npcData.tileX * 16 + 8;
-        const ny = npcData.tileY * 16 + 12;
-        const npcSprite = this.add.sprite(nx, ny, npcData.sprite);
-        npcSprite.setDepth(10);
+        const feetY = npcData.tileY * 16 + 16;
+        const override = NPC_BY_NAME[npcData.name];
+
+        let npcSprite;
+        let topY; // borde superior visible, para colocar el nombre/indicador
+
+        if (override && this.textures.exists(override.key)) {
+          // Sprite estatico de alta resolucion: se conserva el PNG original
+          // (sin recomprimir ni reducir) y se filtra LINEAR para que el
+          // reescalado sea nitido (el pixelArt global usa NEAREST y lo
+          // aserraria). El origen va en los pies para que el vaiven pivotee
+          // sobre el suelo.
+          this.textures.get(override.key).setFilter(Phaser.Textures.FilterMode.LINEAR);
+          npcSprite = this.add.image(nx, feetY, override.key);
+          npcSprite.setScale(override.height / override.contentH);
+          npcSprite.setOrigin(override.originX, override.originY);
+          topY = feetY - override.height;
+        } else {
+          npcSprite = this.add.sprite(nx, feetY - 4, npcData.sprite);
+          topY = feetY - 16;
+        }
+        this.ySortables.push(npcSprite);
 
         npcSprite.interactType = 'npc';
         npcSprite.interactDialogue = npcData.dialogue;
         npcSprite.npcName = npcData.name;
 
-        const nameTag = this.add.text(nx, ny - 20, npcData.name, {
+        const nameTag = this.add.text(nx, topY - 4, npcData.name, {
           fontSize: '7px', color: '#c4a35a', fontFamily: 'monospace',
           stroke: '#000', strokeThickness: 1,
         }).setOrigin(0.5).setDepth(11);
 
-        const indicator = this.add.text(nx, ny - 28, '▼', {
+        const indicator = this.add.text(nx, topY - 12, '▼', {
           fontSize: '8px', color: '#f1c40f', fontFamily: 'monospace',
         }).setOrigin(0.5).setVisible(false).setDepth(60);
         npcSprite.interactIndicator = indicator;
 
         this.tweens.add({
           targets: indicator,
-          y: ny - 31,
+          y: topY - 15,
           duration: 600,
           yoyo: true,
           repeat: -1,
+        });
+
+        // Idle "tambaleo": vaiven suave de izquierda a derecha rotando sobre
+        // los pies. El retardo y la duracion varian por NPC para que no se
+        // muevan todos sincronizados.
+        this.tweens.add({
+          targets: npcSprite,
+          angle: { from: -2.5, to: 2.5 },
+          duration: 1200 + ((npcData.tileX + npcData.tileY) % 5) * 140,
+          delay: (npcData.tileX * 37 + npcData.tileY * 71) % 500,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
         });
 
         this.npcSprites.push(npcSprite);
@@ -368,7 +438,7 @@ export class GameScene extends Phaser.Scene {
     if (mapData.enemies && !GameState.defeatedBosses.includes(`boss_${mapId}`)) {
       mapData.enemies.forEach(enemyData => {
         const enemy = new Enemy(this, enemyData.x, enemyData.y, enemyData);
-        enemy.setDepth(9);
+        this.ySortables.push(enemy);
         this.enemySprites.push(enemy);
       });
     }
@@ -595,6 +665,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   setupCollisions() {
+    // Arte definitivo de la casa (solo aplica al mapa 'casa').
+    const casaArt = this.currentMapId === 'casa' ? MAP_CASA_ART : null;
+
     const wallTiles = this.mapTiles.filter(tile => {
       if (!this.currentMapData.walls) return false;
       const tx = Math.floor((tile.x - 8) / 16);
@@ -605,6 +678,21 @@ export class GameScene extends Phaser.Scene {
 
     if (wallTiles.length > 0) {
       this.physics.add.collider(this.player, wallTiles);
+    }
+
+    // Colisiones con el mobiliario de la casa (mesa, cama, escritorios,
+    // espejo, ventana, puerta, carta). Sus zonas de interacción (20x20)
+    // siguen siendo solo de solapamiento para la tecla E.
+    if (casaArt && casaArt.colliders) {
+      const furnitureTiles = this.mapTiles.filter(tile => {
+        const tx = Math.floor((tile.x - 8) / 16);
+        const ty = Math.floor((tile.y - 8) / 16);
+        const tileId = this.currentMapData.tiles[ty]?.[tx] ?? -1;
+        return Object.prototype.hasOwnProperty.call(casaArt.colliders, tileId);
+      });
+      if (furnitureTiles.length > 0) {
+        this.physics.add.collider(this.player, furnitureTiles);
+      }
     }
 
     this.physics.add.overlap(this.player, this.enemySprites, (player, enemy) => {
@@ -664,7 +752,10 @@ export class GameScene extends Phaser.Scene {
       if (trigger.condition === 'first_visit') {
         GameState.visitedMaps.push(`trigger_${trigger.id}`);
         this.time.delayedCall(800, () => {
-          this.showDialogue(Dialogues[trigger.dialogue] || [trigger.dialogue]);
+          // Pasar el ID (no el array ya resuelto): showDialogue vuelve a
+          // buscar en Dialogues, y pasarle un array anidaba [[...]] el
+          // dialogo (rompia el nombre y concatenaba todas las frases).
+          this.showDialogue(trigger.dialogue);
         });
       }
     });
@@ -791,10 +882,30 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.hud.update();
+
+    // Y-Sorting: orden de renderizado basado en el eje Y. Los objetos con
+    // Y menor (más arriba en pantalla) se renderizan detrás; los de Y mayor
+    // (más abajo) se renderizan delante. Así el jugador queda visualmente
+    // tras un mueble alto al caminar por su lado norte, y delante al caminar
+    // por su lado sur, sin solaparse ilógicamente por debajo.
+    for (const obj of this.ySortables) {
+      if (obj && obj.y !== undefined) {
+        obj.setDepth(obj.y);
+      }
+    }
   }
 
   showDialogue(dialogueId) {
-    const lines = Dialogues[dialogueId] || [dialogueId];
+    // Acepta tanto un ID de Dialogues como el array de lineas ya resuelto.
+    // Antes solo resolvia: si le llegaba un array (p. ej.
+    // showDialogue(Dialogues[trigger.dialogue])), lo usaba como clave
+    // (undefined) y devolvia [array] => [[linea1, linea2, ...]]. El box de
+    // dialogo veia UNA sola "linea" que era en realidad el array entero, y
+    // la escribia a caracter por caracter concatenando todas las frases sin
+    // espacio ni salto ("¿Que paso?Maria Jose: Samuel...").
+    const lines = Array.isArray(dialogueId)
+      ? dialogueId
+      : Dialogues[dialogueId] || [dialogueId];
     this.dialogueSystem.show(lines);
   }
 
@@ -809,7 +920,9 @@ export class GameScene extends Phaser.Scene {
 
   collectFragment(fragmentData) {
     if (this.saveSystem) this.saveSystem.save();
-    this.showDialogue(Dialogues[fragmentData] || ['Fragmento obtenido.']);
+    // Resolver fuera y pasar el resultado (ID o array): showDialogue acepta
+    // ambos, y asi el fallback por defecto se mantiene si la clave no existe.
+    this.showDialogue(Dialogues[fragmentData] || 'Fragmento obtenido.');
   }
 
   changeMap(targetMap, spawnX, spawnY) {

@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { ProceduralAssets } from '../systems/ProceduralAssets.js';
+import { NPC_TEXTURE_FILES } from '../data/NpcSprites.js';
+import { CASA_TEXTURE_FILES } from '../data/CasaSprites.js';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -9,9 +11,23 @@ export class PreloadScene extends Phaser.Scene {
   preload() {
     this.load.image('mariajose_sheet', 'assets/sprites/mariajose_sheet.png');
     this.load.image('samuel', 'assets/sprites/samuel_npc.png');
+    Object.entries(NPC_TEXTURE_FILES).forEach(([key, path]) => {
+      this.load.image(key, path);
+    });
+    Object.entries(CASA_TEXTURE_FILES).forEach(([key, path]) => {
+      this.load.image(key, path);
+    });
   }
 
   create() {
+    // Filtro LINEAR para el arte importado (casa y NPCs): el pixelArt
+    // global usa NEAREST y el reescalado reducido lo serraría.
+    [...Object.keys(NPC_TEXTURE_FILES), ...Object.keys(CASA_TEXTURE_FILES)].forEach((key) => {
+      if (this.textures.exists(key)) {
+        this.textures.get(key).setFilter(Phaser.Textures.FilterMode.LINEAR);
+      }
+    });
+
     this.cameras.main.setBackgroundColor(0x0a0a1e);
 
     const barW = 300, barH = 20;

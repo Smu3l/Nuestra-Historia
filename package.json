@@ -1,6 +1,6 @@
 {
   "name": "los-fragmentos-de-nuestra-historia",
-  "version": "1.1.16",
+  "version": "1.1.23",
   "description": "Los Fragmentos de Nuestra Historia - Una aventura RPG de María José",
   "main": "electron/main.js",
   "scripts": {

@@ -408,6 +408,7 @@ export class ProceduralAssets {
       ['tile_heart', (ctx) => { ctx.fillStyle = '#e74c3c'; ctx.fillRect(2, 4, 5, 5); ctx.fillRect(9, 4, 5, 5); ctx.fillRect(3, 8, 10, 3); ctx.fillRect(5, 11, 6, 2); ctx.fillRect(7, 13, 2, 1); }],
       ['tile_letter', (ctx) => { ctx.fillStyle = '#f5f5dc'; ctx.fillRect(2, 3, 12, 10); ctx.fillStyle = '#deb887'; ctx.fillRect(2, 3, 12, 3); ctx.fillStyle = '#e74c3c'; ctx.fillRect(8, 1, 4, 4); }],
       ['tile_lantern', (ctx) => { ctx.fillStyle = '#333'; ctx.fillRect(6, 0, 4, 3); ctx.fillStyle = '#c4a35a'; ctx.fillRect(4, 3, 8, 8); ctx.fillStyle = '#f1c40f'; ctx.fillRect(5, 4, 6, 6); ctx.fillStyle = '#333'; ctx.fillRect(6, 11, 4, 5); }],
+      ['tile_window', (ctx) => { ctx.fillStyle = '#8B6914'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#74b9ff'; ctx.fillRect(2, 2, 12, 12); ctx.fillStyle = '#c4a35a'; ctx.fillRect(3, 3, 2, 10); ctx.fillRect(11, 3, 2, 10); ctx.fillRect(3, 3, 10, 2); ctx.fillRect(3, 11, 10, 2); }],
     ];
 
     specials.forEach(([id, drawFn]) => {

@@ -85,8 +85,16 @@ export class DialogueSystem {
       return;
     }
 
+    // Normalización defensiva: cada "línea" debe ser un string. Si llega
+    // un string suelto se envuelve, y si llega un array anidado (error de
+    // quien llama: le pasó el array completo como si fuera una línea) se
+    // une con saltos de renglón en vez de concatenarse sin separador
+    // ("¿Qué pasó?María José: Samuel...").
+    const lines = (Array.isArray(dialogueLines) ? dialogueLines : [dialogueLines])
+      .map((line) => (Array.isArray(line) ? line.join('\n') : String(line)));
+
     this.isActive = true;
-    this.currentDialogue = dialogueLines;
+    this.currentDialogue = lines;
     this.currentIndex = 0;
     this.onComplete = onComplete;
     this.container.setVisible(true);
@@ -120,22 +128,36 @@ export class DialogueSystem {
     }
 
     const line = this.currentDialogue[this.currentIndex];
-    this.fullText = line;
     this.displayedText = '';
     this.typing = true;
     this.dialogText.setText('');
 
-    if (line.includes(':')) {
-      const parts = line.split(':');
+    // Si el nombre y el texto van en la misma cadena ("Nombre: frase"),
+    // se separa el nombre a su propia linea.
+    const text = typeof line === 'string' ? line : String(line);
+    if (text.includes(':')) {
+      const parts = text.split(':');
       this.nameText.setText(parts[0].trim());
       this.fullText = parts.slice(1).join(':').trim();
     } else {
       this.nameText.setText('');
+      this.fullText = text;
     }
 
     let charIndex = 0;
     if (this.typeTimer) this.typeTimer.destroy();
     this.promptText.setAlpha(0);
+
+    // Linea vacia (p. ej. saltos en la escena final): no hay nada que
+    // escribir; se marca como terminada para que un toque pase a la siguiente.
+    if (this.fullText.length === 0) {
+      this.typing = false;
+      this.promptText.setAlpha(1);
+      return;
+    }
+
+    // El ultimo tick (charIndex == length) marca la linea como terminada y
+    // muestra el indicador de avance, para poder pasar con una sola pulsacion.
     this.typeTimer = this.scene.time.addEvent({
       delay: 30,
       repeat: this.fullText.length - 1,
@@ -144,7 +166,8 @@ export class DialogueSystem {
           this.displayedText += this.fullText[charIndex];
           this.dialogText.setText(this.displayedText);
           charIndex++;
-        } else {
+        }
+        if (charIndex >= this.fullText.length) {
           this.typing = false;
           this.promptText.setAlpha(1);
         }
