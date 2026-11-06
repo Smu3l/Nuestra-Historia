@@ -352,34 +352,58 @@ export class ProceduralAssets {
 
   generateTiles() {
     const tileTypes = {
-      'tile_grass': { base: '#4a7c59', detail: '#3d6b4a' },
-      'tile_dirt': { base: '#8B6914', detail: '#7a5c12' },
-      'tile_stone': { base: '#808080', detail: '#696969' },
-      'tile_water': { base: '#2980b9', detail: '#3498db' },
-      'tile_sand': { base: '#f0d9a0', detail: '#e6cc8a' },
-      'tile_brick': { base: '#a0522d', detail: '#8B4513' },
-      'tile_wood': { base: '#c4a35a', detail: '#b8963e' },
-      'tile_marsh': { base: '#2d5016', detail: '#1e3a0f' },
-      'tile_marsh_water': { base: '#1a3a2a', detail: '#0d2818' },
-      'tile_snow': { base: '#ecf0f1', detail: '#dfe6e9' },
-      'tile_dark': { base: '#1a1a2e', detail: '#16213e' },
-      'tile_memorial': { base: '#ffecd2', detail: '#fcbf49' },
-      'tile_wall': { base: '#5a5a5a', detail: '#4a4a4a' },
-      'tile_door': { base: '#8B4513', detail: '#654321' },
-      'tile_carpet': { base: '#c0392b', detail: '#a93226' },
-      'tile_floor': { base: '#deb887', detail: '#d2a86e' },
-      'tile_light': { base: '#f5f5dc', detail: '#fafad2' },
+      'tile_grass': { base: '#4a7c59', detail: '#3d6b4a', accent: '#5f946d' },
+      'tile_dirt': { base: '#8B6914', detail: '#7a5c12', accent: '#9a7720' },
+      'tile_stone': { base: '#808080', detail: '#696969', accent: '#949494' },
+      'tile_water': { base: '#2980b9', detail: '#3498db', accent: '#5dade2' },
+      'tile_sand': { base: '#f0d9a0', detail: '#e6cc8a', accent: '#f5e2b8' },
+      'tile_brick': { base: '#a0522d', detail: '#8B4513', accent: '#b8683a' },
+      'tile_wood': { base: '#c4a35a', detail: '#b8963e', accent: '#d4b86a' },
+      'tile_marsh': { base: '#2d5016', detail: '#1e3a0f', accent: '#3a6520' },
+      'tile_marsh_water': { base: '#1a3a2a', detail: '#0d2818', accent: '#265040' },
+      'tile_snow': { base: '#ecf0f1', detail: '#dfe6e9', accent: '#ffffff' },
+      'tile_dark': { base: '#1a1a2e', detail: '#16213e', accent: '#24244a' },
+      'tile_memorial': { base: '#ffecd2', detail: '#fcbf49', accent: '#fff4de' },
+      'tile_wall': { base: '#5a5a5a', detail: '#4a4a4a', accent: '#6a6a6a' },
+      'tile_door': { base: '#8B4513', detail: '#654321', accent: '#a05828' },
+      'tile_carpet': { base: '#c0392b', detail: '#a93226', accent: '#d64a3c' },
+      'tile_floor': { base: '#deb887', detail: '#d2a86e', accent: '#e8cfa0' },
+      'tile_light': { base: '#f5f5dc', detail: '#fafad2', accent: '#fffff0' },
     };
 
     Object.entries(tileTypes).forEach(([id, colors]) => {
       this.createTexture(id, 16, 16, (ctx) => {
         ctx.fillStyle = colors.base;
         ctx.fillRect(0, 0, 16, 16);
-        ctx.fillStyle = colors.detail;
-        for (let i = 0; i < 4; i++) {
-          const x = (i * 7 + 2) % 14;
-          const y = (i * 5 + 1) % 14;
-          ctx.fillRect(x, y, 3, 3);
+        // textura más rica
+        for (let i = 0; i < 12; i++) {
+          const x = (i * 7 + 3) % 16;
+          const y = (i * 5 + 2) % 16;
+          ctx.fillStyle = i % 3 === 0 ? colors.accent : colors.detail;
+          ctx.fillRect(x, y, i % 4 === 0 ? 2 : 1, i % 5 === 0 ? 2 : 1);
+        }
+        if (id === 'tile_water' || id === 'tile_marsh_water') {
+          ctx.strokeStyle = colors.accent;
+          ctx.globalAlpha = 0.5;
+          ctx.beginPath(); ctx.moveTo(1, 5); ctx.quadraticCurveTo(5, 3, 9, 5); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(6, 11); ctx.quadraticCurveTo(10, 9, 14, 11); ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+        if (id === 'tile_grass') {
+          ctx.strokeStyle = colors.accent;
+          ctx.globalAlpha = 0.6;
+          for (let g = 0; g < 4; g++) {
+            const gx = 2 + g * 4;
+            const gy = 3 + (g % 2) * 6;
+            ctx.beginPath(); ctx.moveTo(gx, gy + 2); ctx.lineTo(gx + 1, gy); ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
+        }
+        if (id === 'tile_brick' || id === 'tile_wall') {
+          ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+          ctx.strokeRect(0.5, 0.5, 15, 7);
+          ctx.strokeRect(0.5, 8.5, 7, 7);
+          ctx.strokeRect(8.5, 8.5, 7, 7);
         }
       });
     });
@@ -389,30 +413,92 @@ export class ProceduralAssets {
 
   generateSpecialTiles() {
     const specials = [
-      ['tile_tree', (ctx) => { ctx.fillStyle = '#2d5016'; ctx.fillRect(3, 0, 10, 10); ctx.fillStyle = '#4a7c59'; ctx.fillRect(1, 2, 14, 8); ctx.fillRect(3, 0, 10, 12); ctx.fillStyle = '#5a3a1a'; ctx.fillRect(6, 10, 4, 6); }],
-      ['tile_rock', (ctx) => { ctx.fillStyle = '#808080'; ctx.fillRect(2, 4, 12, 10); ctx.fillStyle = '#999'; ctx.fillRect(3, 4, 10, 4); }],
-      ['tile_flowers', (ctx) => { ctx.fillStyle = '#4a7c59'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#ff6b9d'; ctx.fillRect(3, 3, 3, 3); ctx.fillStyle = '#feca57'; ctx.fillRect(9, 5, 3, 3); ctx.fillStyle = '#ff9ff3'; ctx.fillRect(5, 10, 3, 3); }],
-      ['tile_bridge', (ctx) => { ctx.fillStyle = '#8B6914'; ctx.fillRect(0, 4, 16, 8); ctx.fillStyle = '#c4a35a'; ctx.fillRect(2, 6, 12, 4); }],
-      ['tile_chest', (ctx) => { ctx.fillStyle = '#8B4513'; ctx.fillRect(2, 4, 12, 10); ctx.fillStyle = '#FFD700'; ctx.fillRect(7, 8, 2, 2); }],
-      ['tile_sign', (ctx) => { ctx.fillStyle = '#5a3a1a'; ctx.fillRect(7, 8, 2, 8); ctx.fillStyle = '#c4a35a'; ctx.fillRect(2, 2, 12, 8); }],
-      ['tile_waterfall', (ctx) => { ctx.fillStyle = '#2980b9'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#74b9ff'; ctx.fillRect(4, 0, 3, 16); ctx.fillRect(9, 0, 3, 16); }],
-      ['tile_cabin_wall', (ctx) => { ctx.fillStyle = '#5a3a1a'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#8B6914'; for (let i = 0; i < 16; i += 4) ctx.fillRect(0, i, 16, 1); }],
-      ['tile_cabin_floor', (ctx) => { ctx.fillStyle = '#c4a35a'; ctx.fillRect(0, 0, 16, 16); }],
-      ['tile_island', (ctx) => { ctx.fillStyle = '#2d5016'; ctx.fillRect(2, 2, 12, 12); }],
-      ['tile_campfire', (ctx) => { ctx.fillStyle = '#4a7c59'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#8B4513'; ctx.fillRect(4, 6, 8, 6); ctx.fillStyle = '#e74c3c'; ctx.fillRect(5, 3, 6, 5); ctx.fillStyle = '#f1c40f'; ctx.fillRect(7, 3, 2, 2); }],
-      ['tile_bed', (ctx) => { ctx.fillStyle = '#5a3a1a'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#c0392b'; ctx.fillRect(2, 2, 12, 10); ctx.fillStyle = '#fff'; ctx.fillRect(3, 2, 10, 3); }],
-      ['tile_desk', (ctx) => { ctx.fillStyle = '#5a3a1a'; ctx.fillRect(1, 4, 14, 10); ctx.fillStyle = '#74b9ff'; ctx.fillRect(4, 1, 8, 4); }],
-      ['tile_mirror', (ctx) => { ctx.fillStyle = '#c4a35a'; ctx.fillRect(3, 0, 10, 14); ctx.fillStyle = '#a29bfe'; ctx.fillRect(4, 1, 8, 12); }],
-      ['tile_photo', (ctx) => { ctx.fillStyle = '#8B4513'; ctx.fillRect(2, 2, 12, 12); ctx.fillStyle = '#deb887'; ctx.fillRect(3, 3, 10, 10); ctx.fillStyle = '#e84393'; ctx.fillRect(5, 4, 2, 3); ctx.fillStyle = '#0984e3'; ctx.fillRect(9, 4, 2, 3); }],
+      ['tile_tree', (ctx) => {
+        // tronco
+        ctx.fillStyle = '#6b4423'; ctx.fillRect(6, 9, 4, 7);
+        ctx.fillStyle = '#5a3818'; ctx.fillRect(7, 10, 2, 6);
+        // copa (capas para volumen)
+        ctx.fillStyle = '#1f4d1a'; ctx.fillRect(2, 2, 12, 9); ctx.fillRect(1, 4, 14, 6);
+        ctx.fillStyle = '#2f6b28'; ctx.fillRect(3, 1, 10, 8); ctx.fillRect(2, 3, 12, 6);
+        ctx.fillStyle = '#4a8f3a'; ctx.fillRect(4, 2, 8, 5); ctx.fillRect(3, 4, 10, 3);
+        // luces/hojas
+        ctx.fillStyle = '#6fbd57';
+        ctx.fillRect(4, 3, 2, 1); ctx.fillRect(9, 4, 2, 1); ctx.fillRect(6, 6, 2, 1); ctx.fillRect(11, 5, 1, 1);
+        ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.fillRect(2, 8, 12, 2);
+      }],
+      ['tile_rock', (ctx) => {
+        ctx.fillStyle = '#6f6f6f'; ctx.fillRect(2, 5, 12, 9);
+        ctx.fillStyle = '#8a8a8a'; ctx.fillRect(3, 4, 10, 6);
+        ctx.fillStyle = '#a3a3a3'; ctx.fillRect(4, 4, 5, 3);
+        ctx.fillStyle = '#5a5a5a'; ctx.fillRect(2, 12, 12, 2);
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.strokeRect(2.5, 4.5, 11, 9);
+      }],
+      ['tile_flowers', (ctx) => {
+        ctx.fillStyle = '#4a7c59'; ctx.fillRect(0, 0, 16, 16);
+        const drawFlower = (x,y,c) => { ctx.fillStyle = c; ctx.fillRect(x,y,2,2); ctx.fillRect(x-1,y+1,4,1); ctx.fillRect(x,y+2,2,1); ctx.fillStyle='#f7d774'; ctx.fillRect(x,y+1,2,1); };
+        drawFlower(4,3,'#ff6b9d'); drawFlower(11,5,'#feca57'); drawFlower(6,10,'#a29bfe'); drawFlower(12,11,'#ff9ff3');
+        ctx.fillStyle = '#3d6b4a'; ctx.fillRect(1,2,1,1); ctx.fillRect(8,8,1,1); ctx.fillRect(14,3,1,1);
+      }],
+      ['tile_bridge', (ctx) => {
+        ctx.fillStyle = '#3b6ea5'; ctx.fillRect(0, 0, 16, 16);
+        ctx.fillStyle = '#8B6914'; ctx.fillRect(0, 4, 16, 8);
+        ctx.fillStyle = '#b8863b'; ctx.fillRect(0, 5, 16, 1); ctx.fillRect(0, 10, 16, 1);
+        ctx.fillStyle = '#6b4f1d'; for (let x=1;x<16;x+=3) ctx.fillRect(x,4,1,8);
+        ctx.fillStyle = '#d4a657'; ctx.fillRect(0,6,16,4);
+      }],
+      ['tile_chest', (ctx) => { ctx.fillStyle = '#8B4513'; ctx.fillRect(2, 4, 12, 10); ctx.fillStyle = '#a05828'; ctx.fillRect(3,5,10,8); ctx.fillStyle = '#FFD700'; ctx.fillRect(7, 8, 2, 2); ctx.fillStyle='#5a2d0c'; ctx.fillRect(2,7,12,1); }],
+      ['tile_sign', (ctx) => { ctx.fillStyle = '#5a3a1a'; ctx.fillRect(7, 8, 2, 8); ctx.fillStyle = '#c4a35a'; ctx.fillRect(2, 2, 12, 8); ctx.fillStyle='#8b6a2e'; ctx.fillRect(3,3,10,1); ctx.fillRect(4,5,8,1); ctx.fillRect(4,7,6,1); }],
+      ['tile_waterfall', (ctx) => { ctx.fillStyle = '#2980b9'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#74b9ff'; ctx.fillRect(4, 0, 3, 16); ctx.fillRect(9, 0, 3, 16); ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillRect(5,2,1,12); ctx.fillRect(10,4,1,10); }],
+      ['tile_cabin_wall', (ctx) => { ctx.fillStyle = '#5a3a1a'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#8B6914'; for (let i = 0; i < 16; i += 4) ctx.fillRect(0, i, 16, 1); ctx.fillStyle='rgba(0,0,0,0.15)'; for(let i=1;i<16;i+=4) ctx.fillRect(0,i,16,1); }],
+      ['tile_cabin_floor', (ctx) => { ctx.fillStyle = '#c4a35a'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle='#b08d48'; for(let i=0;i<16;i+=4) ctx.fillRect(0,i,16,1); }],
+      ['tile_island', (ctx) => { ctx.fillStyle = '#2d5016'; ctx.fillRect(2, 2, 12, 12); ctx.fillStyle='#3f7030'; ctx.fillRect(3,3,10,10); ctx.fillStyle='#558a3f'; ctx.fillRect(5,4,6,4); }],
+      ['tile_campfire', (ctx) => { ctx.fillStyle = '#4a7c59'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#8B4513'; ctx.fillRect(4, 8, 8, 4); ctx.fillStyle='#5a3a1a'; ctx.fillRect(5,9,6,2); ctx.fillStyle = '#e74c3c'; ctx.fillRect(5, 3, 6, 6); ctx.fillStyle = '#f39c12'; ctx.fillRect(6,4,4,4); ctx.fillStyle = '#f1c40f'; ctx.fillRect(7, 3, 2, 3); }],
+      ['tile_bed', (ctx) => { ctx.fillStyle = '#5a3a1a'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#c0392b'; ctx.fillRect(2, 2, 12, 10); ctx.fillStyle='#a5281b'; ctx.fillRect(2,8,12,4); ctx.fillStyle = '#fff'; ctx.fillRect(3, 2, 10, 3); }],
+      ['tile_desk', (ctx) => { ctx.fillStyle = '#5a3a1a'; ctx.fillRect(1, 4, 14, 10); ctx.fillStyle='#6b4423'; ctx.fillRect(2,5,12,8); ctx.fillStyle = '#74b9ff'; ctx.fillRect(4, 1, 8, 4); ctx.fillStyle='#dfe6e9'; ctx.fillRect(5,2,6,2); }],
+      ['tile_mirror', (ctx) => { ctx.fillStyle = '#c4a35a'; ctx.fillRect(3, 0, 10, 14); ctx.fillStyle = '#a29bfe'; ctx.fillRect(4, 1, 8, 12); ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillRect(5,2,2,8); }],
+      ['tile_photo', (ctx) => { ctx.fillStyle = '#8B4513'; ctx.fillRect(2, 2, 12, 12); ctx.fillStyle = '#deb887'; ctx.fillRect(3, 3, 10, 10); ctx.fillStyle = '#e84393'; ctx.fillRect(5, 4, 2, 3); ctx.fillStyle = '#0984e3'; ctx.fillRect(9, 4, 2, 3); ctx.fillStyle='#6ab04c'; ctx.fillRect(4,9,8,3); }],
       ['tile_fragment', (ctx) => { ctx.fillStyle = '#f1c40f'; ctx.fillRect(4, 2, 8, 12); ctx.fillStyle = '#fff'; ctx.fillRect(6, 5, 4, 6); }],
-      ['tile_heart', (ctx) => { ctx.fillStyle = '#e74c3c'; ctx.fillRect(2, 4, 5, 5); ctx.fillRect(9, 4, 5, 5); ctx.fillRect(3, 8, 10, 3); ctx.fillRect(5, 11, 6, 2); ctx.fillRect(7, 13, 2, 1); }],
-      ['tile_letter', (ctx) => { ctx.fillStyle = '#f5f5dc'; ctx.fillRect(2, 3, 12, 10); ctx.fillStyle = '#deb887'; ctx.fillRect(2, 3, 12, 3); ctx.fillStyle = '#e74c3c'; ctx.fillRect(8, 1, 4, 4); }],
+      ['tile_heart', (ctx) => { ctx.fillStyle = '#e74c3c'; ctx.fillRect(2, 4, 5, 5); ctx.fillRect(9, 4, 5, 5); ctx.fillRect(3, 8, 10, 3); ctx.fillRect(5, 11, 6, 2); ctx.fillRect(7, 13, 2, 1); ctx.fillStyle='#ff7675'; ctx.fillRect(3,5,2,2); }],
+      ['tile_letter', (ctx) => { ctx.fillStyle = '#f5f5dc'; ctx.fillRect(2, 3, 12, 10); ctx.fillStyle = '#deb887'; ctx.fillRect(2, 3, 12, 3); ctx.fillStyle = '#e74c3c'; ctx.fillRect(8, 1, 4, 4); ctx.fillStyle='#999'; ctx.fillRect(4,7,8,1); ctx.fillRect(4,9,6,1); }],
       ['tile_lantern', (ctx) => { ctx.fillStyle = '#333'; ctx.fillRect(6, 0, 4, 3); ctx.fillStyle = '#c4a35a'; ctx.fillRect(4, 3, 8, 8); ctx.fillStyle = '#f1c40f'; ctx.fillRect(5, 4, 6, 6); ctx.fillStyle = '#333'; ctx.fillRect(6, 11, 4, 5); }],
-      ['tile_window', (ctx) => { ctx.fillStyle = '#8B6914'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#74b9ff'; ctx.fillRect(2, 2, 12, 12); ctx.fillStyle = '#c4a35a'; ctx.fillRect(3, 3, 2, 10); ctx.fillRect(11, 3, 2, 10); ctx.fillRect(3, 3, 10, 2); ctx.fillRect(3, 11, 10, 2); }],
+      ['tile_window', (ctx) => { ctx.fillStyle = '#8B6914'; ctx.fillRect(0, 0, 16, 16); ctx.fillStyle = '#74b9ff'; ctx.fillRect(2, 2, 12, 12); ctx.fillStyle = '#c4a35a'; ctx.fillRect(3, 3, 2, 10); ctx.fillRect(11, 3, 2, 10); ctx.fillRect(3, 3, 10, 2); ctx.fillRect(3, 11, 10, 2); ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.fillRect(4,4,3,4); }],
     ];
 
     specials.forEach(([id, drawFn]) => {
       this.createTexture(id, 16, 16, drawFn);
+    });
+
+    // Casa exterior para el overworld (más detallada, 32x32)
+    this.createTexture('tile_house_exterior', 32, 32, (ctx) => {
+      // Techo
+      ctx.fillStyle = '#7a3b1e';
+      ctx.beginPath();
+      ctx.moveTo(2, 14); ctx.lineTo(16, 2); ctx.lineTo(30, 14); ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#8f4524';
+      ctx.fillRect(4, 12, 24, 3);
+      // Paredes
+      ctx.fillStyle = '#d8b07a';
+      ctx.fillRect(5, 14, 22, 15);
+      ctx.fillStyle = '#c89a60';
+      ctx.fillRect(5, 22, 22, 2);
+      // Puerta
+      ctx.fillStyle = '#6b3f1f';
+      ctx.fillRect(13, 20, 6, 9);
+      ctx.fillStyle = '#f1c40f';
+      ctx.fillRect(17, 24, 1, 1);
+      // Ventanas
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(7, 17, 4, 4);
+      ctx.fillRect(21, 17, 4, 4);
+      ctx.fillStyle = '#d8b07a';
+      ctx.fillRect(9, 17, 1, 4);
+      ctx.fillRect(7, 19, 4, 1);
+      ctx.fillRect(23, 17, 1, 4);
+      ctx.fillRect(21, 19, 4, 1);
+      // Base/sombra
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.fillRect(5, 28, 22, 2);
     });
   }
 

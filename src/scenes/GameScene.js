@@ -265,6 +265,19 @@ export class GameScene extends Phaser.Scene {
 
           this.mapTiles.push(tile);
 
+          // Movimiento sutil en agua/lagos para dar vida al mapa.
+          if (tileName === 'tile_water' || tileName === 'tile_marsh_water' || tileName === 'tile_waterfall') {
+            this.tweens.add({
+              targets: tile,
+              alpha: { from: 0.82, to: 1 },
+              duration: 900 + ((x * 17 + y * 31) % 500),
+              delay: ((x * 13 + y * 7) % 400),
+              yoyo: true,
+              repeat: -1,
+              ease: 'Sine.easeInOut',
+            });
+          }
+
           if (casaArt && casaArt.colliders && casaArt.colliders[tileId]) {
             // Hitbox solo en la base del mueble: cuerpo duro infranqueable,
             // pero el sprite del jugador puede superponerse por arriba al
@@ -278,6 +291,11 @@ export class GameScene extends Phaser.Scene {
             // Placeholder reemplazado por una pieza del arte: solo se
             // oculta el dibujo; el cuerpo estático sigue intacto.
             tile.setVisible(false);
+            // Piso debajo para evitar huecos negros (todo va sobre piso café claro).
+            if (this.textures.exists('tile_floor')) {
+              const floor = this.add.image(x * 16 + 8, y * 16 + 8, 'tile_floor');
+              floor.setDepth(0);
+            }
           }
         }
       }
@@ -298,8 +316,23 @@ export class GameScene extends Phaser.Scene {
           this.interactables.push(exitZone);
 
           if (!(casaArt && casaArt.ocultarSalida)) {
-            const doorSprite = this.add.image(worldX, worldY, 'tile_door');
-            doorSprite.setDepth(1);
+            const spriteKey = obj.sprite && this.textures.exists(obj.sprite) ? obj.sprite : 'tile_door';
+            const doorSprite = this.add.image(worldX, worldY, spriteKey);
+            const isHouse = spriteKey === 'tile_house_exterior';
+            if (isHouse) {
+              doorSprite.setScale(1.6);
+              doorSprite.setOrigin(0.5, 0.85); // asentada sobre el suelo
+              doorSprite.setDepth(5);
+            } else {
+              doorSprite.setDepth(spriteKey === 'tile_door' ? 1 : 5);
+            }
+            if (obj.label) {
+              const labelY = isHouse ? worldY - 34 : worldY - 14;
+              this.add.text(worldX, labelY, obj.label, {
+                fontSize: '6px', color: '#ffeaa7', fontFamily: 'monospace',
+                stroke: '#000', strokeThickness: 2,
+              }).setOrigin(0.5).setDepth(12);
+            }
           }
         } else if (obj.type === 'boss_arena') {
           const zone = this.add.zone(worldX, worldY, 16, 16);

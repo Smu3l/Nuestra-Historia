@@ -42,13 +42,22 @@ export const Maps = {
     height: 45,
     bgColor: 0x2d3436,
     playerStart: { x: 40, y: 42 },
-    tiles: generateDistanceMap(),
+    tiles: (() => {
+      const m = generateDistanceMap();
+      // Área despejada para la casa de María José (salida/entrada visible al aparecer)
+      for (let yy = 40; yy <= 43; yy++) {
+        for (let xx = 37; xx <= 41; xx++) {
+          if (m[yy] && m[yy][xx] !== undefined) m[yy][xx] = 0; // césped despejado
+        }
+      }
+      return m;
+    })(),
     tileNames: { 0: 'tile_grass', 1: 'tile_dirt', 2: 'tile_stone', 3: 'tile_water', 4: 'tile_tree', 5: 'tile_bridge', 6: 'tile_rock', 7: 'tile_flowers', 8: 'tile_sign' },
     walls: [4, 3, 6],
     objects: [
       { tileX: 40, tileY: 41, type: 'interact', id: 'distancia_intro', sprite: 'tile_sign', dialogue: 'distancia_intro' },
       { tileX: 72, tileY: 8, type: 'boss_arena', id: 'boss_distancia', target: 'boss_distancia' },
-      { tileX: 8, tileY: 6, type: 'exit', target: 'casa', spawnX: 3, spawnY: 11 },
+      { tileX: 38, tileY: 41, type: 'exit', target: 'casa', spawnX: 2, spawnY: 6, sprite: 'tile_house_exterior', label: 'Casa de María José' },
     ],
     npcs: [
       { tileX: 30, tileY: 19, sprite: 'npc_wanderer', dialogue: 'distancia_npc1', name: 'Caminante' },
